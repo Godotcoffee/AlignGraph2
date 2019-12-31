@@ -57,3 +57,14 @@ template<typename T, typename Functor>
 void MultiThreadTools::multiTraversal(const std::vector<T> &obj, unsigned threadNum, Functor fun) {
     traversalHelper(obj, threadNum, fun);
 }
+
+template<typename Functor>
+void MultiThreadTools::mulitFunctor(unsigned threadNum, Functor f) {
+    std::vector<std::thread> threads;
+    for (unsigned t = 0; t < threadNum; ++t) {
+        threads.emplace_back(f, t);
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+}

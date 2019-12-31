@@ -32,6 +32,9 @@ public:
 
     template<typename T, typename Functor>
     static void multiTraversal(const std::vector<T> &obj, unsigned threadNum, Functor fun);
+
+    template <typename Functor>
+    static void mulitFunctor(unsigned threadNum, Functor f);
 };
 
 #include "MultiThreadTools.tcc"
