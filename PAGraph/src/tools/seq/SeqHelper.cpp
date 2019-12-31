@@ -59,7 +59,8 @@ void SeqHelper::loadFromFasta(const std::string &fastaPath,
 void SeqHelper::autoLoadFromFile(
         const std::string &path,
         std::function<void(const std::string &,const std::string &)> f) {
-    bool useFasta = !path.empty() && std::tolower(path.back()) == 'a';
+    auto fileType = testFileType(path);
+    bool useFasta = fileType == "fasta";
 
     if (useFasta) {
         loadFromFasta(path, [&](const std::string &name, const std::string &seq) {
@@ -69,5 +70,30 @@ void SeqHelper::autoLoadFromFile(
         loadFromFastq(path, [&](const std::string &l1, const std::string &l2, const std::string &l3, const std::string &l4) {
             f(l1, l2);
         });
+    }
+}
+
+std::string SeqHelper::testFileType(const std::string &path) {
+    std::ifstream in(path);
+
+    if (!in) {
+        return "unknown";
+    }
+
+    std::string firstLine;
+
+    if (!std::getline(in, firstLine) || firstLine.empty()) {
+        return "unknown";
+    }
+
+    auto first = firstLine.front();
+
+    switch (first) {
+        case '@':
+            return "fastq";
+        case '>': case ';':
+            return "fasta";
+        default:
+            return "unknown";
     }
 }

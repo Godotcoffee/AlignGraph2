@@ -625,7 +625,7 @@ namespace args
 
         /** Show the {OPTIONS} on the prog line when this is true
          */
-        bool showProglineOptions = true;
+        bool showProglineOptions = false;
 
         /** Show the positionals on the prog line when this is true
          */

@@ -8,7 +8,7 @@
 
 int main() {
     FileKmerIterator it("/mnt/hdd1/Project/Genome/counter/yeast.kmer");
-    std::atomic_size_t cnt;
+    std::atomic_size_t cnt(0);
     std::cout << it.kSize() << std::endl;
     it.iterate([&](std::uint64_t code) {
             ++cnt;

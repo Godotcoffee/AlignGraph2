@@ -12,7 +12,7 @@ MecatAlignDatabase::MecatAlignDatabase(const std::string &filePath) {
 
         ParseAlignTools::parseDiff(l2, l3, readDiff, refDiff);
 
-        _alignments.emplace_back(align.queryName, align.refName, std::stoll(align.score), align.queryBegin, align.queryEnd,
+        _alignments.emplace_back(align.queryName, align.refName, std::atoll(align.score.c_str()), align.queryBegin, align.queryEnd,
                 align.refBegin, align.refEnd, align.forward, readDiff, refDiff);
     });
 

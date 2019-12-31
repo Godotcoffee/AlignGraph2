@@ -10,6 +10,8 @@
 #include <functional>
 
 class SeqHelper {
+private:
+    static std::string testFileType(const std::string &path);
 public:
     static void autoLoadFromFile(const std::string &path,
                                  std::function<void(

@@ -66,37 +66,6 @@ void printConfigs(const std::vector<Config> &configs) {
 
 int run2(int argc, char* argv[])
 {
-    /*const char *readsPath = "/home/amadeus/Storehouse/Project/Genome/datasrc/yeast_filtered.fastq";
-    const char *readsSamplePath = "/home/amadeus/Storehouse/Project/Genome/datasrc/yeast_filtered_sample.fastq";
-    const char *contigsPath = "/home/amadeus/Storehouse/Project/Genome/datasrc/yeast.quiver.ctg.fasta";
-    const char *referencesPath = "/home/amadeus/Storehouse/Project/Genome/datasrc/GCF_000146045.2_R64_genomic.fna";
-    const char *readToRefPath = "/home/amadeus/Storehouse/Project/Genome/reference/result/read_to_ref.txt";
-    const char *readToContigPath = "/home/amadeus/Storehouse/Project/Genome/reference/result/read_to_contig.txt";
-    const char *contigToRefPath = "/home/amadeus/Storehouse/Project/Genome/mummer/ref_ctg.myalign";
-    const char *graphPath = "/home/amadeus/Storehouse/Project/Genome/graph/graph14.h5";
-
-    int refIndex = -1;
-    int readToCtgTopK = -1;
-    int ctgToRefTopK = -1;
-    int readToRefTopK = -1;
-    int outerSample = 4;
-    int innerSample = 1;
-    double readToCtgRatio = 0.40;
-    double readToRefRatio = 0.20;
-    double ctgToRefRatio = 0.05;
-    double ctgToRefTotalRatio = 0.3;
-    std::size_t posError = 10;
-    unsigned threadNum = 8;
-
-    const char *readsPath = "/home/amadeus/Storehouse/Project/Genome/datasrc/yeast_filtered.fastq";
-    const char *readsSamplePath = "/home/amadeus/Storehouse/Project/Genome/datasrc/yeast_filtered_sample.fastq";
-    const char *contigsPath = "/home/amadeus/Storehouse/Project/Genome/datasrc/yeast.quiver.ctg.fasta";
-    const char *referencesPath = "/home/amadeus/Storehouse/Project/Genome/datasrc/GCA_001515485.2_Saccharomyces_pastorianus_Weihenstephan_34_70_chromosomes_assembly_1.0_genomic.fna";
-    const char *readToRefPath = "/home/amadeus/Storehouse/Project/Genome/reference2/result/read_to_ref.txt";
-    const char *readToContigPath = "/home/amadeus/Storehouse/Project/Genome/reference2/result/read_to_contig.txt";
-    const char *contigToRefPath = "/home/amadeus/Storehouse/Project/Genome/mummer2/ref_ctg.myalign";
-    const char *graphPath = "/home/amadeus/Storehouse/Project/Genome/graph/graph14.h5";*/
-
     unsigned threadNum = 8;
 
     {std::stringstream ss; ss << argv[1]; ss >> threadNum;}
@@ -113,7 +82,7 @@ int run2(int argc, char* argv[])
     std::string readToRefPath = rootDir + "/read_to_ref";
     std::string readToContigPath = rootDir + "/read_to_contig";
     std::string contigToRefPath = rootDir + "/contig_to_ref";
-    std::string kmerPath = rootDir + "/graph.h5";
+    std::string kmerPath = rootDir + "/kmer";
     std::string readsSamplePath = rootDir + "/read_sample";
     std::string inputDir = rootDir + "/input";
 
@@ -155,6 +124,8 @@ int run2(int argc, char* argv[])
     std::cout << "Loading References" << std::endl;
 
     auto pRefDB = std::make_shared<AutoSeqDatabase>(referencesPath);
+
+    AutoSeqDatabase as = *pRefDB;
 
     std::cout << "Done! reference number=" << pRefDB->size() << std::endl;
 
