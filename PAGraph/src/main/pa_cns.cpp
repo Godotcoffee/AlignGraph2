@@ -21,13 +21,13 @@ int main(int argc, char *argv[]) {
 
 
     args::ArgumentParser parser("pa_cns", "");
-    args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-    args::ValueFlag<unsigned> threadArg(parser, "thread_num", "Number of thread", {'t', "thread"}, 16);
-    args::ValueFlag<std::size_t> partLenArg(parser, "size", "Length of part", {'l', "len"}, 500);
-    args::ValueFlag<std::size_t> topKArg(parser, "k", "Length of part", {'k', "top_k"}, 2000);
-    args::ValueFlag<std::string> inputArg(parser, "path", "Input of backbone", {'i', "in"});
-    args::ValueFlag<std::string> outputArg(parser, "path", "Output of file", {'o', "out"});
-    args::ValueFlag<std::string> alignArg(parser, "path", "Alignments file", {'a', "align"});
+    args::HelpFlag help(parser, "help", "display this help menu", {'h', "help"});
+    args::ValueFlag<unsigned> threadArg(parser, "thread_num", "number of thread", {'t', "thread"}, 16);
+    args::ValueFlag<std::size_t> partLenArg(parser, "size", "length of part", {'l', "len"}, 10000);
+    args::ValueFlag<std::size_t> topKArg(parser, "k", "length of part", {'k', "top_k"}, 3000);
+    args::ValueFlag<std::string> inputArg(parser, "path", "input of backbone", {'i', "in"});
+    args::ValueFlag<std::string> outputArg(parser, "path", "output of file", {'o', "out"});
+    args::ValueFlag<std::string> alignArg(parser, "path", "alignments file", {'a', "align"});
 
     if (argc <= 1) {
         std::cerr << parser;

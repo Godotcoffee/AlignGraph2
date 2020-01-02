@@ -98,14 +98,14 @@ void kmerCounter(const std::string &readPath, const std::string &outPath, std::s
 int main(int argc, char *argv[])
 {
     args::ArgumentParser parser("kmer_counter", "");
-    args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-    args::ValueFlag<unsigned>    threadArg(parser, "thread_num", "Number of thread", {'t', "thread"}, 16);
-    args::ValueFlag<std::string> inputArg(parser, "path", "Input of backbone", {'i', "in"});
-    args::ValueFlag<std::string> outputArg(parser, "path", "Output of file", {'o', "out"});
+    args::HelpFlag help(parser, "help", "display this help menu", {'h', "help"});
+    args::ValueFlag<unsigned>    threadArg(parser, "thread_num", "number of thread", {'t', "thread"}, 16);
+    args::ValueFlag<std::string> inputArg(parser, "path", "input of backbone", {'i', "in"});
+    args::ValueFlag<std::string> outputArg(parser, "path", "output of file", {'o', "out"});
     args::ValueFlag<std::size_t> kArg(parser, "k", "kmer size", {'k', "kmer"}, 14);
-    args::ValueFlag<double>      thresholdArg(parser, "threshold", "Threshold for min abundance", {'m', "min"}, 0.2);
-    args::ValueFlag<std::size_t> partLenArg(parser, "size", "Number of hash table", {'p', "part"}, 4);
-    args::ValueFlag<std::size_t> bufferSizeArg(parser, "size", "Size of each batch", {'s', "size"}, 10240);
+    args::ValueFlag<double>      thresholdArg(parser, "threshold", "threshold for min abundance", {'m', "min"}, 0.2);
+    args::ValueFlag<std::size_t> partLenArg(parser, "size", "number of hash table", {'p', "part"}, 4);
+    args::ValueFlag<std::size_t> bufferSizeArg(parser, "size", "size of each batch", {'s', "size"}, 10240);
 
     if (argc <= 1) {
         std::cerr << parser;

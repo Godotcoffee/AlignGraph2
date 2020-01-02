@@ -3,7 +3,7 @@ project(PAGraph)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set (LIB_COMPILE_WARNINGS "-Wall -Wno-unused-function -Wno-format")
+set(LIB_COMPILE_WARNINGS "-Wall -Wno-unused-function -Wno-format")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(debug 1)

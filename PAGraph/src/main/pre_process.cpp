@@ -210,16 +210,16 @@ unsigned acgt(char ch) {
 int main(int argc, char *argv[])
 {
     args::ArgumentParser parser("pre_process", "");
-    args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-    args::ValueFlag<std::string> readArg(parser, "path", "Read path", {'r', "read"});
-    args::ValueFlag<std::string> contigArg(parser, "path", "Contig path", {'c', "contig"});
-    args::ValueFlag<std::string> readToCtgArg(parser, "path", "Alignment path of read to contig", {'x', "read_to_ctg"});
-    args::ValueFlag<std::string> readToRefArg(parser, "path", "Alignment path of read to reference", {'y', "read_to_ref"});
-    args::ValueFlag<std::string> contigToRefArg(parser, "path", "Alignment path of contig to reference", {'z', "ctg_to_ref"});
-    args::ValueFlag<std::string> outArg(parser, "path", "Output directory", {'o', "output"});
-    args::ValueFlag<std::size_t> topKArg(parser, "unsigned", "Top K of alignment", {'k', "top_k"}, 1);
-    args::ValueFlag<double> alignRatioArg(parser, "double", "Alignment min threshold", {'m', "min"}, 0.15);
-    args::Flag testArg(parser, "test", "Only do one step", {"test"});
+    args::HelpFlag help(parser, "help", "display this help menu", {'h', "help"});
+    args::ValueFlag<std::string> readArg(parser, "path", "read path", {'r', "read"});
+    args::ValueFlag<std::string> contigArg(parser, "path", "contig path", {'c', "contig"});
+    args::ValueFlag<std::string> readToCtgArg(parser, "path", "alignment path of read to contig", {'x', "read_to_ctg"});
+    args::ValueFlag<std::string> readToRefArg(parser, "path", "alignment path of read to reference", {'y', "read_to_ref"});
+    args::ValueFlag<std::string> contigToRefArg(parser, "path", "alignment path of contig to reference", {'z', "ctg_to_ref"});
+    args::ValueFlag<std::string> outArg(parser, "path", "output directory", {'o', "output"});
+    args::ValueFlag<std::size_t> topKArg(parser, "unsigned", "top K of alignment", {'k', "top_k"}, 1);
+    args::ValueFlag<double> alignRatioArg(parser, "double", "alignment min threshold", {'m', "min"}, 0.15);
+    args::Flag testArg(parser, "test", "only do one step", {"test"});
 
     if (argc <= 1) {
         std::cerr << parser;
