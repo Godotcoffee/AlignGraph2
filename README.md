@@ -15,7 +15,7 @@ Python >= 3.6
 ## Installation
 
 ```sh
-git clone https://github.com/Godotcoffee/AlignGraph2
+git clone --recursive https://github.com/Godotcoffee/AlignGraph2
 cd AlignGraph2 && python ./install.py
 ```
 
