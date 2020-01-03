@@ -1,3 +1,6 @@
 [submodule "mecat_plus"]
 	path = mecat_plus
 	url = https://github.com/ahexinyu/formal
+[submodule "thirdparty/mecat"]
+	path = thirdparty/mecat
+	url = https://github.com/xiaochuanle/MECAT2
