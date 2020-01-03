@@ -7,10 +7,9 @@
 #include "kmer/KmerHelper.hpp"
 #include "tools/MyTools.hpp"
 
-PABruijnGraph::PABruijnGraph(const IKmerIterator &kmerIt, std::size_t minAbundance, unsigned threadNum) :
+PABruijnGraph::PABruijnGraph(const IKmerIterator &kmerIt, unsigned threadNum) :
         _kmerSize(kmerIt.kSize()),
-        _indexMask((1UL << (_kmerSize * 2)) - 1),
-        _minAbundance(minAbundance) {
+        _indexMask((1UL << (_kmerSize * 2)) - 1) {
 
     std::vector<KmerIndex> idxAbundance;
 

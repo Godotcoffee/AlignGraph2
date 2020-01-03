@@ -19,9 +19,6 @@ if __name__ == '__main__':
 
         pagraph_dir = os.path.join(root_dir, 'PAGraph')
         pagraph_build = os.path.join(pagraph_dir, 'build')
-        if os.path.isdir(pagraph_build):
-            shutil.rmtree(pagraph_build)
-        os.makedirs(pagraph_build, exist_ok=True)
 
         print('#', file=log_f, flush=True)
         print('# Begin of Building PAGraph', file=log_f, flush=True)
@@ -34,7 +31,8 @@ if __name__ == '__main__':
         ret = subprocess.run(['cmake', '..'],
                              stdout=log_f,
                              stderr=subprocess.STDOUT,
-                             cwd=os.path.join(pagraph_dir, 'build'))
+                             cwd=pagraph_build)
+
         print('#', file=log_f, flush=True)
         print('# End of CMake', file=log_f, flush=True)
 
@@ -45,10 +43,12 @@ if __name__ == '__main__':
         print('#', file=log_f, flush=True)
         print('# Begin of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
+
         ret = subprocess.run(['make', '-j4'],
                              stdout=log_f,
                              stderr=subprocess.STDOUT,
                              cwd=os.path.join(pagraph_dir, 'build'))
+
         print('# End of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
 
@@ -62,21 +62,82 @@ if __name__ == '__main__':
 
         print('Done. Took {:.3f} seconds'.format(time.time() - start_time))
 
-        # Build MECAT+
-        print('Building MECAT+...')
+        # Build MECAT
+        print('Building MECAT...')
         start_time = time.time()
+
+        mecat_dir = os.path.join(root_dir, 'thirdparty', 'mecat')
 
         print('#', file=log_f, flush=True)
         print('# Begin of Building MECAT+', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
 
-        # TODO
-
         print('#', file=log_f, flush=True)
-        print('# End of Building MECAT+', file=log_f, flush=True)
+        print('# Begin of make', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        ret = subprocess.run(['make', '-j4'],
+                             stdout=log_f,
+                             stderr=subprocess.STDOUT,
+                             cwd=mecat_dir)
+
+        if ret.returncode != 0:
+            print('Failed to build mecat, please check {}'.format(log_f.name))
+            exit(1)
+
+        print('# End of make', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        print('# End of Building MECAT', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
 
         print('Done. Took {:.3f} seconds'.format(time.time() - start_time))
 
-    # Build MECAT+
+        # Build MUMmer
+        print('Building MUMmer...')
+        start_time = time.time()
 
+        mummer_dir = os.path.join(root_dir, 'thirdparty', 'mummer')
+
+        print('#', file=log_f, flush=True)
+        print('# Begin of Building MUMmer', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        print('#', file=log_f, flush=True)
+        print('# Begin of configure', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        ret = subprocess.run(['./configure'],
+                             stdout=log_f,
+                             stderr=subprocess.STDOUT,
+                             cwd=mummer_dir)
+
+        if ret.returncode != 0:
+            print('Failed to build mummer, please check {}'.format(log_f.name))
+            exit(1)
+
+        print('# End of configure', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        print('#', file=log_f, flush=True)
+        print('# Begin of make', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        ret = subprocess.run(['make', '-j4'],
+                             stdout=log_f,
+                             stderr=subprocess.STDOUT,
+                             cwd=mummer_dir)
+
+        if ret.returncode != 0:
+            print('Failed to build mummer, please check {}'.format(log_f.name))
+            exit(1)
+
+        print('# End of make', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        print('# End of Building MUMmer', file=log_f, flush=True)
+        print('#', file=log_f, flush=True)
+
+        print('Done. Took {:.3f} seconds'.format(time.time() - start_time))
+
+    print('All Done. Total Took {:.3f} seconds'.format(time.time() - total_start_time))

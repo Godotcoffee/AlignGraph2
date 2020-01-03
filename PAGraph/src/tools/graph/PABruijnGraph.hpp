@@ -51,7 +51,6 @@ private:
 
     std::size_t _kmerSize;
     std::size_t _indexMask;
-    std::size_t _minAbundance;
 
     char revAcgt(char ch) const;
 
@@ -88,7 +87,7 @@ private:
     template<typename T>
     void sampleSequence(std::vector<std::pair<KmerIndex, std::size_t>> &result, const std::string &seq, std::size_t outerSample, T functor) const;
 public:
-    explicit PABruijnGraph(const IKmerIterator &kmerIt, std::size_t minAbundance, unsigned threadNum = 8);
+    explicit PABruijnGraph(const IKmerIterator &kmerIt, unsigned threadNum = 8);
 
     //void generateEdges(const ISeqDatabase<SeqInf> &seqDB, int outerSample, bool reverse = true, unsigned threadNum = 8);
 

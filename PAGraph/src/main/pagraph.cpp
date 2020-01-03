@@ -3,6 +3,7 @@
 #include <regex>
 #include <chrono>
 #include <utility>
+#include <args.hxx>
 #include <align/MummerAlignDatabaseV2.hpp>
 #include <graph/UnionSet.hpp>
 #include "seq/AutoSeqDatabase.hpp"
@@ -66,25 +67,41 @@ void printConfigs(const std::vector<Config> &configs) {
 
 int run2(int argc, char* argv[])
 {
-    unsigned threadNum = 8;
+    args::ArgumentParser parser("pagraph", "");
+    args::HelpFlag help(parser, "help", "display this help menu", {'h', "help"});
+    args::ValueFlag<unsigned> threadArg(parser, "thread_num", "number of thread", {'t', "thread"}, 16);
+    args::ValueFlag<std::string> kmerArg(parser, "path", "solid kmer set path", {'k', "kmer"});
+    args::ValueFlag<std::string> readArg(parser, "path", "read path", {'r', "read"});
+    args::ValueFlag<std::string> ctgArg(parser, "path", "contig path", {'c', "contig"});
+    args::ValueFlag<std::string> refArg(parser, "path", "reference path", {'R', "ref"});
+    args::ValueFlag<std::string> preArg(parser, "path", "pre process directory", {'p', "pre_process"});
+    args::ValueFlag<std::string> ctgToRefArg(parser, "path", "alignment path of contig to reference", {'a', "aln"});
+    args::ValueFlag<std::string> outArg(parser, "path", "output directory", {'o', "output"});
 
-    {std::stringstream ss; ss << argv[1]; ss >> threadNum;}
-    
-    std::string rootDir = argv[3];
-    std::string outDir = argv[4];
-    std::size_t minAbundance = 20;
-    {std::stringstream ss; ss << argv[2]; ss >> minAbundance;}
+    if (argc <= 1) {
+        std::cerr << parser;
+        return 0;
+    }
 
-    std::string readsPath = rootDir + "/read";
-    //std::string readsSamplePath = rootDir + "/read.fastq";
-    std::string contigsPath = rootDir + "/contig";
-    std::string referencesPath = rootDir + "/reference";
-    std::string readToRefPath = rootDir + "/read_to_ref";
-    std::string readToContigPath = rootDir + "/read_to_contig";
-    std::string contigToRefPath = rootDir + "/contig_to_ref";
-    std::string kmerPath = rootDir + "/kmer";
-    std::string readsSamplePath = rootDir + "/read_sample";
-    std::string inputDir = rootDir + "/input";
+    try {
+        parser.ParseCLI(argc, argv);
+    } catch (const args::Help&) {
+        std::cerr << parser;
+        return 0;
+    } catch (const args::ParseError &e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << parser;
+        return 1;
+    }
+
+    auto threadNum = args::get(threadArg);
+    auto kmerPath = args::get(kmerArg);
+    auto readsPath = args::get(readArg);
+    auto contigsPath = args::get(ctgArg);
+    auto referencesPath = args::get(refArg);
+    auto inputDir = args::get(preArg);
+    auto contigToRefPath = args::get(ctgToRefArg);
+    auto outDir = args::get(outArg);
 
     int readToCtgTopK = -1;
     int ctgToRefTopK = -1;
@@ -141,7 +158,7 @@ int run2(int argc, char* argv[])
 
     std::cout << "Building original pa Graph" << std::endl;
 
-    auto pPaGraph = std::make_shared<PABruijnGraph>(*pKmerIt, minAbundance, threadNum);
+    auto pPaGraph = std::make_shared<PABruijnGraph>(*pKmerIt, threadNum);
 
     std::cout << "Done! kmer number=" << pPaGraph->availableKmerNumber() << std::endl;
 
@@ -403,15 +420,5 @@ void test1() {
 
 int main (int argc, char* argv[])
 {
-    //testAligner(); return 0;
-    //testMapper(); return 0;
-    //testFlag(); return 0;
-    //test1(); return 0;
-
-    if (argc < 5) {
-        std::cerr << "No enough arguments." << std::endl;
-        return 1;
-    }
     return run2(argc, argv);
 }
-

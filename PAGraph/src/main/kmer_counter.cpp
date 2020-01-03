@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     args::ArgumentParser parser("kmer_counter", "");
     args::HelpFlag help(parser, "help", "display this help menu", {'h', "help"});
     args::ValueFlag<unsigned>    threadArg(parser, "thread_num", "number of thread", {'t', "thread"}, 16);
-    args::ValueFlag<std::string> inputArg(parser, "path", "input of backbone", {'i', "in"});
+    args::ValueFlag<std::string> inputArg(parser, "path", "input of read", {'i', "in"});
     args::ValueFlag<std::string> outputArg(parser, "path", "output of file", {'o', "out"});
     args::ValueFlag<std::size_t> kArg(parser, "k", "kmer size", {'k', "kmer"}, 14);
     args::ValueFlag<double>      thresholdArg(parser, "threshold", "threshold for min abundance", {'m', "min"}, 0.2);

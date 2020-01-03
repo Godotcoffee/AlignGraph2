@@ -10,7 +10,7 @@ GCC >= 4.8.5
 
 CMake >= 3.1.0
 
-Python >= 3.6
+Python >= 3.6 with Biopython
 
 ## Installation
 
