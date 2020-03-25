@@ -325,3 +325,41 @@ void PAlgorithm::searchPANode(std::vector<std::pair<PABruijnGraph::ANode, size_t
         }
     }
 }
+
+template<typename Functor>
+void PAlgorithm::searchPANode2(std::vector<std::pair<PABruijnGraph::ANode, size_t>> &aNodes,
+                              std::vector<PABruijnGraph::PANode> &result, bool onlyFirst, std::size_t pos, std::size_t deviation, Functor f) {
+
+    std::set<PABruijnGraph::PANode::UniqueType> unique;
+
+    auto left = pos - std::min(pos, 1000 * deviation);
+    auto right = pos + 1000 * deviation;
+
+    for (auto &node : aNodes) {
+        if (node.second < left) {
+            continue;
+        }
+        if (node.second > right) {
+            break;
+        }
+        auto &aNode = node.first;
+        for (decltype(aNode.size()) i = 0; i < aNode.size(); ++i) {
+            auto pos = aNode[i];
+            auto dualPos1 = _pCtgMapper->singleToDual(static_cast<std::size_t>(pos.first));
+            auto dualPos2 = _pRefMapper->singleToDual(static_cast<std::size_t>(pos.second));
+
+            auto paNode = PABruijnGraph::PANode(aNode, i);
+            auto uniqueHelper = paNode.getUniqueHelper();
+
+            if (!aNode.isUsed(i) && unique.count(uniqueHelper) == 0 &&
+                f(node.second, dualPos1.first, dualPos1.second, dualPos2.first, dualPos2.second)) {
+
+                result.push_back(paNode);
+                unique.insert(uniqueHelper);
+            }
+        }
+        if (!result.empty() && onlyFirst) {
+            break;
+        }
+    }
+}

@@ -3,6 +3,7 @@
 //
 
 #include "Aligner.hpp"
+#include <map>
 
 void Aligner::init(bool debug) {
     if (!_isInit) {

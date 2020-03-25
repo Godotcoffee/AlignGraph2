@@ -359,8 +359,8 @@ PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviati
 
         std::string parentKmer;
 
-        searchPANode(
-                aNodes, paNodes, false,
+        searchPANode2(
+                aNodes, paNodes, false, lastCtgPos, deviation,
                 [&](std::size_t, std::int64_t curCtgIdx, std::uint64_t curCtgPos, std::int64_t,
                     std::int64_t) -> bool {
 

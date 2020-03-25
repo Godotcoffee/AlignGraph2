@@ -5,6 +5,8 @@
 #include "PAssembly.hpp"
 #include "UnionSet.hpp"
 
+#include <map>
+
 std::set<std::pair<std::string, bool>>
 PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std::shared_ptr<PABruijnGraph> pGraph,
                        std::shared_ptr<const ISeqDatabase<SeqInf>> pReadDB,
@@ -35,6 +37,8 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
         std::ofstream of(outDir + "/" + prefix
                          + std::to_string(ctgIdx) + "_" + std::to_string(ctgOffset) + ".txt");
 
+        of << ctgName.first << "\t" << (*pContigDB)[ctgIdx].size() << std::endl;
+
         for (auto &s : results[2 * ctgIdx + ctgOffset]) {
             auto firstPos = s.first.getPosition().first;
             auto secondPos = s.first.getPosition().second;
@@ -58,7 +62,7 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
                 auto idx = static_cast<decltype(ctgIdx)>(std::abs(dualPos.first) - 1);
                 auto forward = dualPos.first > 0 ? 0 : 1;
 
-                if (idx != ctgIdx || forward != ctgOffset) {
+                if ((idx != ctgIdx || forward != ctgOffset)) {
                     ++inDegrees[2 * idx + forward];
                 }
             }
@@ -66,6 +70,28 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
         //}
         std::cout << "[Travel] End" << std::endl;
+    }
+
+    for (auto &ctgName : ctgSet) {
+        auto ctgIdx = pContigDB->seqId(ctgName.first);
+        auto ctgOffset = ctgName.second ? 0 : 1;
+
+        if (!results[2 * ctgIdx + ctgOffset].empty()) {
+            auto lastCtgPos = results[2 * ctgIdx + ctgOffset].back().first.getPosition().first;
+
+            if (lastCtgPos != 0) {
+                auto dualPos = pCtgMapper->singleToDual(lastCtgPos);
+                auto idx = static_cast<decltype(ctgIdx)>(std::abs(dualPos.first) - 1);
+                auto forward = dualPos.first > 0 ? 0 : 1;
+
+                if ((idx != ctgIdx || forward != ctgOffset)) {
+                    if (results[2 * idx + forward].empty()) {
+                        results[2 * ctgIdx + ctgOffset].pop_back();
+                        --inDegrees[2 * idx + forward];
+                    }
+                }
+            }
+        }
     }
 
     for (std::size_t i = 0; i < inDegrees.size(); ++i) {
@@ -173,7 +199,7 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
         combatSeq(results, *pCtgMapper, i / 2, i % 2 == 0,
                   [&](std::size_t ctgId, bool forward, std::size_t startPos)-> bool {
-                      //nameStream << prefix << ctgId << "_" << (forward ? 0 : 1) << "_" << (*pContigDB)[ctgId].size() << ";";
+                      //nameStream << prefix << ctgId << "_" << (forward ? 0 : 1) << "_" << (*pContigDB)[ctgId].name() << "_" << (*pContigDB)[ctgId].size() << ";";
                       connected.emplace(ctgId, forward);
                       return true;
                   });

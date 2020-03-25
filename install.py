@@ -20,6 +20,8 @@ if __name__ == '__main__':
         pagraph_dir = os.path.join(root_dir, 'PAGraph')
         pagraph_build = os.path.join(pagraph_dir, 'build')
 
+        os.makedirs(pagraph_build, exist_ok=True)
+
         print('#', file=log_f, flush=True)
         print('# Begin of Building PAGraph', file=log_f, flush=True)
         print('#', file=log_f, flush=True)

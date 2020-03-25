@@ -100,6 +100,13 @@ private:
             bool onlyFirst,
             Functor f);
 
+    template<typename Functor>
+    void searchPANode2(
+            std::vector<std::pair<PABruijnGraph::ANode, size_t>> &aNodes,
+            std::vector<PABruijnGraph::PANode> &result,
+            bool onlyFirst, std::size_t pos, std::size_t deviation,
+            Functor f);
+
     std::int64_t appendSeq(TravelSequence &base, const TravelSequence &tail, std::size_t deviation);
 public:
     explicit PAlgorithm(
