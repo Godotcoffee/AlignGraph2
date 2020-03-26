@@ -197,15 +197,19 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
         std::set<std::pair<std::size_t, bool>> connected;
 
+        std::size_t maxLen = 0, totalLen = 0;
+
         combatSeq(results, *pCtgMapper, i / 2, i % 2 == 0,
                   [&](std::size_t ctgId, bool forward, std::size_t startPos)-> bool {
                       //nameStream << prefix << ctgId << "_" << (forward ? 0 : 1) << "_" << (*pContigDB)[ctgId].name() << "_" << (*pContigDB)[ctgId].size() << ";";
                       connected.emplace(ctgId, forward);
+                      maxLen = std::max(maxLen, (*pContigDB)[ctgId].size());
+                      totalLen += algo.seqSize(results[ctgId * 2 + (forward ? 0 : 1)]);
                       return true;
                   });
 
-        bool isConnected = connected.size() > 1;
-        bool isExtended = !isConnected && algo.seqSize(results[i]) > (*pContigDB)[ctgIdx].size() * 1.2;
+        bool isConnected = connected.size() > 1 && totalLen > maxLen * 1.05;
+        bool isExtended = connected.size() == 1 && algo.seqSize(results[i]) > (*pContigDB)[ctgIdx].size() * 1.2;
 
         if (isConnected || isExtended) {
 
@@ -213,6 +217,16 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
             std::string outPath(outDir + "/" + prefix
                                 + std::to_string(i / 2) + "_" + std::to_string(i % 2) + ".fasta");
+
+            std::string helpPath(outDir + "/" + prefix
+                                + std::to_string(i / 2) + "_" + std::to_string(i % 2) + ".help");
+
+            std::ofstream helpOut(helpPath);
+
+            helpOut << totalLen << std::endl;
+            helpOut << maxLen << std::endl;
+
+            helpOut.close();
 
             std::ofstream fastaOf(outPath);
 
