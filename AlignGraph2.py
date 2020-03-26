@@ -60,6 +60,12 @@ if __name__ == '__main__':
     nucmer_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'nucmer')
     delta_fileter_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'delta-filter')
 
+    # k8-linux
+    k8_cmd = os.path.join(root_dir, 'thirdparty', 'k8-linux')
+
+    # paftools
+    paf_tools = os.path.join(root_dir, 'thirdparty', 'minimap2', 'paftools.js')
+
     # Test cmd
     subprocess.run([kmer_count_cmd], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     subprocess.run([pre_process_cmd], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -74,8 +80,10 @@ if __name__ == '__main__':
     mecat_ref_dir = os.path.join(mecat_dir, 'ref')
     mummer_dir = os.path.join(wrk_dir, 'mummer')
     mummer_tmp_dir = os.path.join(mummer_dir, 'tmp')
-    input_dir = os.path.join(wrk_dir, 'input')
+    input_dir = os.path.join(wrk_dir, 'input', 'p')
+    sp_input_dir = os.path.join(wrk_dir, 'input', 's')
     pagraph_dir = os.path.join(wrk_dir, 'pagraph')
+    pagraph_m_dir = os.path.join(wrk_dir, 'pagraph2')
     cns_dir = os.path.join(wrk_dir, 'cns')
     cns_in_dir = os.path.join(cns_dir, 'input')
     cns_out_dir = os.path.join(cns_dir, 'output')
@@ -90,7 +98,9 @@ if __name__ == '__main__':
     os.makedirs(mummer_dir, exist_ok=True)
     os.makedirs(mummer_tmp_dir, exist_ok=True)
     os.makedirs(input_dir, exist_ok=True)
+    os.makedirs(sp_input_dir, exist_ok=True)
     os.makedirs(pagraph_dir, exist_ok=True)
+    os.makedirs(pagraph_m_dir, exist_ok=True)
     os.makedirs(cns_dir, exist_ok=True)
     os.makedirs(cns_in_dir, exist_ok=True)
     os.makedirs(cns_out_dir, exist_ok=True)
@@ -144,24 +154,41 @@ if __name__ == '__main__':
     # nucmer
     subprocess.run([nucmer_cmd,
                     '-t', str(thread_num),
+                    '-l', '100',
+                    '-c', '1000',
+                    '--banded',
                     ref_path,
                     ctg_path],
                    cwd=mummer_dir)
 
     # delta-filter
-    out_filter_path = os.path.join(mummer_dir, 'out.filter.delta')
-    with open(out_filter_path, 'w') as filter_f:
-        subprocess.run([delta_fileter_cmd,
-                        '-q',
-                        '-r',
-                        os.path.join(mummer_dir, 'out.delta')],
-                       cwd=mummer_dir,
-                       stdout=filter_f)
+    #out_filter_path = os.path.join(mummer_dir, 'out.filter.delta')
+    #with open(out_filter_path, 'w') as filter_f:
+    #    subprocess.run([delta_fileter_cmd,
+    #                    '-q',
+    #                    '-r',
+    #                    os.path.join(mummer_dir, 'out.delta')],
+    #                   cwd=mummer_dir,
+    #                   stdout=filter_f)
     
     # convert
-    show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
-    import script.parse_nucmer_align
-    script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
+    #show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
+    #import script.parse_nucmer_align
+    #script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
+
+    out_paf_path = os.path.join(mummer_dir, 'out.paf')
+    # convert
+    with open(out_paf_path, 'w') as paf_f:
+        subprocess.run([k8_cmd,
+                        paf_tools,
+                        'delta2paf',
+                        os.path.join(mummer_dir, 'out.delta')],
+                       cwd=mummer_dir,
+                       stdout=paf_f)
+
+    import script.paf2aln
+
+    script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)
 
     print('Done')
 
@@ -177,20 +204,54 @@ if __name__ == '__main__':
                     '-o', input_dir])
 
     print('Done')
-    
+
+    # split
+    import script.split_helper
+    script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
 
     # pagraph
     print('PAGraph...')
 
-    subprocess.run([pagraph_cmd,
-                    '-t', str(thread_num),
-                    '-k', solid_kmer_path,
-                    '-r', read_path,
-                    '-c', ctg_path,
-                    '-R', ref_path,
-                    '-p', input_dir,
-                    '-a', ctg_to_ref_path,
-                    '-o', pagraph_dir])
+    for d in os.listdir(sp_input_dir):
+        in_dir = os.path.join(sp_input_dir, d)
+        out_dir = os.path.join(pagraph_dir, d)
+        os.makedirs(out_dir, exist_ok=True)
+
+        if os.path.isfile(os.path.join(out_dir, 'DONE')):
+            print('Ignore {}'.format(d))
+            continue
+
+        p_ctg_path = os.path.join(in_dir, 'ctg.fasta')
+        p_ref_path = os.path.join(in_dir, 'ref.fasta')
+        p_aln_path = os.path.join(in_dir, 'aln')
+        
+        subprocess.run([
+            pagraph_cmd,
+            '-t', str(thread_num),
+            '-r', 'dummy',
+            '-k', solid_kmer_path,
+            '-c', p_ctg_path,
+            '-R', p_ref_path,
+            '-p', in_dir,
+            '-a', p_aln_path,
+            '-o', out_dir
+        ])
+
+        with open(os.path.join(out_dir, 'DONE'), 'w'):
+            pass
+
+    #subprocess.run([pagraph_cmd,
+    #                '-t', str(thread_num),
+    #                '-k', solid_kmer_path,
+    #                '-r', read_path,
+    #                '-c', ctg_path,
+    #                '-R', ref_path,
+    #                '-p', input_dir,
+    #                '-a', ctg_to_ref_path,
+    #                '-o', pagraph_dir])
+
+    # merge
+    script.split_helper.merge_out(pagraph_dir, pagraph_m_dir)
 
     print('Done')
 
@@ -200,7 +261,7 @@ if __name__ == '__main__':
     print('Extract and split...')
 
     import script.extract
-    script.extract.action(ctg_path, pagraph_dir, os.path.join(pagraph_dir, 'contig.txt'), cns_in_dir)
+    script.extract.action(ctg_path, pagraph_m_dir, os.path.join(pagraph_m_dir, 'contig.txt'), cns_in_dir)
     mapping = cns_helper.split_fasta(os.path.join(cns_in_dir, 'add.fasta'), cns_wrk_split_dir)
 
     print('Done')
