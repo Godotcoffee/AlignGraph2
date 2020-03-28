@@ -23,8 +23,62 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
     std::vector<PAlgorithm::TravelSequence> results(pContigDB->size() * 2);
     std::vector<std::size_t> inDegrees(pContigDB->size() * 2);
+    std::mutex helpLock;
 
-    for (auto &ctgName : ctgSet) {
+    std::vector<std::pair<std::string, bool>> ctgSetList(ctgSet.begin(), ctgSet.end());
+
+    MultiThreadTools::multiTraversal(ctgSetList, std::max(1U, threadNum / 8), [&](unsigned t, std::size_t ii, const std::pair<std::string, bool> &ctgName) {
+        //for (std::size_t i = 0; i < pContigDB->size(); ++i) {
+        auto ctgIdx = pContigDB->seqId(ctgName.first);
+        auto ctgOffset = ctgName.second ? 0 : 1;
+
+        std::cout << "[Travel] " << ctgIdx << " - " << (*pContigDB)[ctgIdx].name() << " - " << (*pContigDB)[ctgIdx].size() << std::endl;
+        //for (int j = 0; j < 2; ++j) {
+        std::cout << "[Travel] " << (ctgOffset == 0 ? "forward" : "reverse") << std::endl;
+        results[2 * ctgIdx + ctgOffset] = algo.travelSequence(ctgIdx, ctgOffset == 0, deviation, errorRate, startSplit);
+
+        std::ofstream of(outDir + "/" + prefix
+                         + std::to_string(ctgIdx) + "_" + std::to_string(ctgOffset) + ".txt");
+
+        of << ctgName.first << "\t" << (*pContigDB)[ctgIdx].size() << std::endl;
+
+        for (auto &s : results[2 * ctgIdx + ctgOffset]) {
+            auto firstPos = s.first.getPosition().first;
+            auto secondPos = s.first.getPosition().second;
+            auto dualPos1 = pCtgMapper->singleToDual(firstPos);
+            auto dualPos2 = pRefMapper->singleToDual(secondPos);
+
+            of << pGraph->toString(s.first) << "\t" << s.second
+               << "\t" << dualPos1.first << "," << dualPos1.second
+               << "\t" << dualPos2.first << "," << dualPos2.second << std::endl;
+        }
+
+        if (PAlgorithm::seqSize(results[2 * ctgIdx + ctgOffset]) < (*pContigDB)[ctgIdx].size() * startSplit * 0.9) {
+            results[2 * ctgIdx + ctgOffset].clear();
+        }
+
+        if (!results[2 * ctgIdx + ctgOffset].empty()) {
+            auto lastCtgPos = results[2 * ctgIdx + ctgOffset].back().first.getPosition().first;
+
+            if (lastCtgPos != 0) {
+                auto dualPos = pCtgMapper->singleToDual(lastCtgPos);
+                auto idx = static_cast<decltype(ctgIdx)>(std::abs(dualPos.first) - 1);
+                auto forward = dualPos.first > 0 ? 0 : 1;
+
+                if ((idx != ctgIdx || forward != ctgOffset)) {
+                    {
+                        std::lock_guard<std::mutex> g(helpLock);
+                        ++inDegrees[2 * idx + forward];
+                    }
+                }
+            }
+        }
+
+        //}
+        std::cout << "[Travel] End" << std::endl;
+    });
+
+    /*for (auto &ctgName : ctgSet) {
         //for (std::size_t i = 0; i < pContigDB->size(); ++i) {
         auto ctgIdx = pContigDB->seqId(ctgName.first);
         auto ctgOffset = ctgName.second ? 0 : 1;
@@ -70,7 +124,7 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
         //}
         std::cout << "[Travel] End" << std::endl;
-    }
+    }*/
 
     for (auto &ctgName : ctgSet) {
         auto ctgIdx = pContigDB->seqId(ctgName.first);

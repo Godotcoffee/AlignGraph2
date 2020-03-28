@@ -73,6 +73,7 @@ if __name__ == '__main__':
     subprocess.run([pa_cns_cmd], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     subprocess.run([mecat_ref_cmd], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     subprocess.run([nucmer_cmd], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    subprocess.run([k8_cmd], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     wrk_dir = os.path.join(out_dir, 'working_dir')
     mecat_dir = os.path.join(wrk_dir, 'mecat')
@@ -207,7 +208,7 @@ if __name__ == '__main__':
 
     # split
     import script.split_helper
-    script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
+    #script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
 
     # pagraph
     print('PAGraph...')

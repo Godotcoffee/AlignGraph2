@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import time
+import stat
 
 if __name__ == '__main__':
     total_start_time = time.time()
@@ -11,6 +12,10 @@ if __name__ == '__main__':
     with open(log_path, 'w') as log_f:
         pass    # Clear file
     print('Log file is located in {}'.format(log_path))
+
+    os.chmod(os.path.join(root_dir, 'thirdparty', 'k8-linux'), stat.S_IXUSR)
+    os.chmod(os.path.join(root_dir, 'thirdparty', 'k8-linux'), stat.S_IXGRP)
+    os.chmod(os.path.join(root_dir, 'thirdparty', 'k8-linux'), stat.S_IXOTH)
 
     with open(log_path, 'a') as log_f:
         # Build PAGraph

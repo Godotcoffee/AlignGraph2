@@ -208,7 +208,7 @@ PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviati
 
     std::deque<PABruijnGraph::PosType> ctgPosQue;
     std::deque<PABruijnGraph::PosType> refPosQue;
-    const std::size_t maxQueSize = 3;
+    const std::size_t maxQueSize = 4;
     bool finalLeap = false;
 
     std::cout << "Ctgstart=" << ctgStart << std::endl;
@@ -234,6 +234,10 @@ PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviati
                                                 *_pCtgMapper, filter);
                     //std::cout << t << " " << "Done" << std::endl;
                 });
+        /*for (std::size_t ii = 0; ii < paNodes.size(); ++ii) {
+            seqResult[ii] = graphTravel(paNodes[ii], deviation, errorRate, {ctgLeft, ctgRight}, varLen, splitLen, splitMin,
+                                                *_pCtgMapper, filter);
+        }*/
 
         //std::cout << "Travel2 Done" << std::endl;
 

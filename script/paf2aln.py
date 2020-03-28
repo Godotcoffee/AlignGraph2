@@ -21,14 +21,9 @@ def paf2aln(ctg_path, ref_path, paf_path, out_path, thread_num=16):
     ctg_dict = SeqIO.to_dict(SeqIO.parse(ctg_path, "fasta"))
     ref_dict = SeqIO.to_dict(SeqIO.parse(ref_path, "fasta"))
 
-    test_cnt = 0
-
     all_lines = open(paf_path).readlines()
 
-    print_lock = threading.Lock()
-
     def thread_fun(start):
-        global test_cnt
         with open(out_path + '_{}'.format(start), 'w') as aln:
             for i in range(start, len(all_lines), thread_num):
                 line = all_lines[i]
@@ -81,18 +76,20 @@ def paf2aln(ctg_path, ref_path, paf_path, out_path, thread_num=16):
                 
                 aln.write('{}\n{}\n'.format(stb1, stb2))
 
-                with print_lock:
-                    test_cnt += 1
-                    if test_cnt % 100 == 0:
-                        print(test_cnt)
-
     thread_list = list()
+
+    merged_list = list()
 
     for i in range(0, thread_num):
         thread_list.append(threading.Thread(target=thread_fun, args=(i, )))
+        merged_list.append(out_path + '_{}'.format(i))
     
     for thread in thread_list:
         thread.start()
 
     for thread in thread_list:
         thread.join()
+
+    import script.cns_helper
+    script.cns_helper.merge_files(out_path, *merged_list)
+
