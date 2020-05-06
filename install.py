@@ -75,6 +75,7 @@ if __name__ == '__main__':
         start_time = time.time()
 
         mecat_dir = os.path.join(root_dir, 'thirdparty', 'mecat')
+        mecat_p_dir = os.path.join(root_dir, 'mecat_plus', 'MECAT-master_1')
 
         print('#', file=log_f, flush=True)
         print('# Begin of Building MECAT+', file=log_f, flush=True)
@@ -92,6 +93,11 @@ if __name__ == '__main__':
         if ret.returncode != 0:
             print('Failed to build mecat, please check {}'.format(log_f.name))
             exit(1)
+        
+        #ret = subprocess.run(['make', '-j4'],
+        #                     stdout=log_f,
+        #                     stderr=subprocess.STDOUT,
+        #                     cwd=mecat_p_dir)
 
         print('# End of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
