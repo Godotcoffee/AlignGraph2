@@ -158,6 +158,10 @@ if __name__ == '__main__':
                     '-o', 'dummy',
                     '-p', read_to_ref2_path],
                    cwd=mecat_ref_dir)
+
+        import script.filter
+
+        script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
     except:
         pass
 
