@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import time
 import stat
+import tarfile
 
 if __name__ == '__main__':
     total_start_time = time.time()
@@ -104,7 +105,14 @@ if __name__ == '__main__':
         print('Building MUMmer...')
         start_time = time.time()
 
+        mummer_tar = os.path.join(root_dir, 'thirdparty', 'mummer-4.0.0beta2.tar.gz')
+
+        t = tarfile.open(mummer_tar)
+        t.extractall(path=os.path.join(root_dir, 'thirdparty'))
+
         mummer_dir = os.path.join(root_dir, 'thirdparty', 'mummer')
+
+        os.rename(os.path.join(root_dir, 'thirdparty', 'mummer-4.0.0beta2'), mummer_dir)
 
         print('#', file=log_f, flush=True)
         print('# Begin of Building MUMmer', file=log_f, flush=True)
@@ -148,3 +156,4 @@ if __name__ == '__main__':
         print('Done. Took {:.3f} seconds'.format(time.time() - start_time))
 
     print('All Done. Total Took {:.3f} seconds'.format(time.time() - total_start_time))
+
