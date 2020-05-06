@@ -56,6 +56,9 @@ if __name__ == '__main__':
     mecat_ref_cmd = os.path.join(root_dir, 'thirdparty', 'mecat',
                                  '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
                                  'bin', 'mecat2ref')
+    mecat_ref2_cmd = os.path.join(root_dir, 'mecat_plus', 'MECAT-master_1'
+                                 '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
+                                 'bin', 'mecat2ref')
     # MUMmer
     nucmer_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'nucmer')
     delta_fileter_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'delta-filter')
@@ -113,8 +116,9 @@ if __name__ == '__main__':
     solid_kmer_path = os.path.join(wrk_dir, 'solid_kmer_set.bin')
     read_to_ctg_path = os.path.join(mecat_ctg_dir, 'read_to_contig.txt')
     read_to_ref_path = os.path.join(mecat_ref_dir, 'read_to_ref.txt')
+    read_to_ref2_path = os.path.join(mecat_ref_dir, 'read_to_ref2.txt')
     ctg_to_ref_path = os.path.join(mummer_dir, 'ctg_to_ref.txt')
-
+    
     # K-mer count
     print('K-Mer counting...')
     subprocess.run([kmer_count_cmd,
@@ -136,17 +140,36 @@ if __name__ == '__main__':
                     '-o', read_to_ctg_path],
                    cwd=mecat_ctg_dir)
     print('Done')
-
+    
     # Read to Ref
     print('Read to Ref...')
-    subprocess.run([mecat_ref_cmd,
+
+    try:
+        if os.path.exists(read_to_ref_path):
+            os.remove(read_to_ref_path)
+        if os.path.exists(read_to_ref2_path):
+            os.remove(read_to_ref2_path)
+        subprocess.run([mecat_ref2_cmd,
                     '-t', str(thread_num),
                     '-d', read_path,
                     '-r', ref_path,
                     '-b', str(1),
                     '-w', './wrk',
-                    '-o', read_to_ref_path],
+                    '-o', 'dummy',
+                    '-p', read_to_ref2_path],
                    cwd=mecat_ref_dir)
+    except:
+        pass
+
+    if not os.path.exists(read_to_ref_path) or not os.path.exists(read_to_ref2_path):
+        subprocess.run([mecat_ref_cmd,
+                        '-t', str(thread_num),
+                        '-d', read_path,
+                        '-r', ref_path,
+                        '-b', str(1),
+                        '-w', './wrk',
+                        '-o', read_to_ref_path],
+                    cwd=mecat_ref_dir)
     print('Done')
     
     # Contig to Ref
@@ -317,3 +340,4 @@ if __name__ == '__main__':
     print('Final output: {}'.format(final_out))
 
     print('Time used: {:.3f} seconds'.format(time.time() - start_time))
+
