@@ -149,7 +149,7 @@ if __name__ == '__main__':
             os.remove(read_to_ref_path)
         if os.path.exists(read_to_ref2_path):
             os.remove(read_to_ref2_path)
-        subprocess.run([mecat_ref2_cmd,
+        ret = subprocess.run([mecat_ref2_cmd,
                     '-t', str(thread_num),
                     '-d', read_path,
                     '-r', ref_path,
@@ -158,10 +158,10 @@ if __name__ == '__main__':
                     '-o', 'dummy',
                     '-p', read_to_ref2_path],
                    cwd=mecat_ref_dir)
-
-        import script.filter
-
-        script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
+                   
+        if ret.returncode == 0:
+            import script.filter
+            script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
     except:
         pass
 
