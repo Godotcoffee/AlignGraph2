@@ -14,10 +14,6 @@ if __name__ == '__main__':
         pass    # Clear file
     print('Log file is located in {}'.format(log_path))
 
-    os.chmod(os.path.join(root_dir, 'thirdparty', 'k8-linux'), stat.S_IXUSR)
-    os.chmod(os.path.join(root_dir, 'thirdparty', 'k8-linux'), stat.S_IXGRP)
-    os.chmod(os.path.join(root_dir, 'thirdparty', 'k8-linux'), stat.S_IXOTH)
-
     with open(log_path, 'a') as log_f:
         # Build PAGraph
         print('Building PAGraph...')
@@ -93,11 +89,13 @@ if __name__ == '__main__':
         if ret.returncode != 0:
             print('Failed to build mecat, please check {}'.format(log_f.name))
             exit(1)
-        
-        #ret = subprocess.run(['make', '-j4'],
-        #                     stdout=log_f,
-        #                     stderr=subprocess.STDOUT,
-        #                     cwd=mecat_p_dir)
+        try:
+            ret = subprocess.run(['make', '-j4'],
+                                stdout=log_f,
+                                stderr=subprocess.STDOUT,
+                                cwd=mecat_p_dir)
+        except:
+            pass
 
         print('# End of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)

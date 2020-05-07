@@ -24,7 +24,8 @@ int main(int argc, char *argv[]) {
     args::HelpFlag help(parser, "help", "display this help menu", {'h', "help"});
     args::ValueFlag<unsigned> threadArg(parser, "thread_num", "number of thread", {'t', "thread"}, 16);
     args::ValueFlag<std::size_t> partLenArg(parser, "size", "length of part", {'l', "len"}, 5000);
-    args::ValueFlag<std::size_t> topKArg(parser, "k", "length of part", {'k', "top_k"}, 3000);
+    args::ValueFlag<std::size_t> topKArg(parser, "k", "top n", {'k', "top_k"}, 3000);
+    args::ValueFlag<std::size_t> alphaArg(parser, "alpha", "alpha", {"alpha"}, 250);
     args::ValueFlag<std::string> inputArg(parser, "path", "input of backbone", {'i', "in"});
     args::ValueFlag<std::string> outputArg(parser, "path", "output of file", {'o', "out"});
     args::ValueFlag<std::string> alignArg(parser, "path", "alignments file", {'a', "align"});
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]) {
     auto partLen    = args::get(partLenArg);
     auto align      = args::get(alignArg);
     auto topK       = args::get(topKArg);
+    auto alpha      = args::get(alphaArg);
 
     AutoSeqDatabase seqDatabase(in);
 
@@ -104,7 +106,7 @@ int main(int argc, char *argv[]) {
 
         //std::cout << "\t" << alignments[i].size() << std::endl;
 
-        auto weights = AlignData::weightAln(alignments[i]);
+        auto weights = AlignData::weightAln(alignments[i], alpha);
 
         auto g = AlnGraphBoost(partSkeleton);
         for (std::size_t ii = 0; ii < weights.size(); ++ii) {

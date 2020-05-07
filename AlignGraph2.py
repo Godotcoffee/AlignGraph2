@@ -56,7 +56,7 @@ if __name__ == '__main__':
     mecat_ref_cmd = os.path.join(root_dir, 'thirdparty', 'mecat',
                                  '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
                                  'bin', 'mecat2ref')
-    mecat_ref2_cmd = os.path.join(root_dir, 'mecat_plus', 'MECAT-master_1'
+    mecat_ref2_cmd = os.path.join(root_dir, 'mecat_plus', 'MECAT-master_1',
                                  '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
                                  'bin', 'mecat2ref')
     # MUMmer
@@ -143,12 +143,13 @@ if __name__ == '__main__':
     
     # Read to Ref
     print('Read to Ref...')
-
+    okok = False
     try:
-        if os.path.exists(read_to_ref_path):
-            os.remove(read_to_ref_path)
-        if os.path.exists(read_to_ref2_path):
-            os.remove(read_to_ref2_path)
+        #if os.path.exists(read_to_ref_path):
+        #    os.remove(read_to_ref_path)
+        #if os.path.exists(read_to_ref2_path):
+        #    os.remove(read_to_ref2_path)
+        #print(mecat_ref2_cmd)
         ret = subprocess.run([mecat_ref2_cmd,
                     '-t', str(thread_num),
                     '-d', read_path,
@@ -158,14 +159,16 @@ if __name__ == '__main__':
                     '-o', 'dummy',
                     '-p', read_to_ref2_path],
                    cwd=mecat_ref_dir)
+        #print(ret.returncode)
                    
         if ret.returncode == 0:
             import script.filter
             script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
+            okok = True
     except:
         pass
 
-    if not os.path.exists(read_to_ref_path) or not os.path.exists(read_to_ref2_path):
+    if not okok:
         subprocess.run([mecat_ref_cmd,
                         '-t', str(thread_num),
                         '-d', read_path,
@@ -182,8 +185,9 @@ if __name__ == '__main__':
     # nucmer
     subprocess.run([nucmer_cmd,
                     '-t', str(thread_num),
-                    '-l', '100',
-                    '-c', '1000',
+                    #'-l', '100',
+                    #'-c', '1000',
+                    '-g', '100',
                     '--banded',
                     ref_path,
                     ctg_path],
@@ -235,7 +239,7 @@ if __name__ == '__main__':
 
     # split
     import script.split_helper
-    #script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
+    script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
 
     # pagraph
     print('PAGraph...')
@@ -245,9 +249,9 @@ if __name__ == '__main__':
         out_dir = os.path.join(pagraph_dir, d)
         os.makedirs(out_dir, exist_ok=True)
 
-        if os.path.isfile(os.path.join(out_dir, 'DONE')):
-            print('Ignore {}'.format(d))
-            continue
+        #if os.path.isfile(os.path.join(out_dir, 'DONE')):
+        #    print('Ignore {}'.format(d))
+        #    continue
 
         p_ctg_path = os.path.join(in_dir, 'ctg.fasta')
         p_ref_path = os.path.join(in_dir, 'ref.fasta')
@@ -277,14 +281,14 @@ if __name__ == '__main__':
     #                '-p', input_dir,
     #                '-a', ctg_to_ref_path,
     #                '-o', pagraph_dir])
-
+    
     # merge
     script.split_helper.merge_out(pagraph_dir, pagraph_m_dir)
 
     print('Done')
 
     import script.cns_helper as cns_helper
-
+    
     # extract
     print('Extract and split...')
 
@@ -312,7 +316,7 @@ if __name__ == '__main__':
 
     # Correct
     print('Correct...')
-    part_len = 5000
+    part_len = 10000
     top_k = 3000
 
     fasta_cor_path_list = list()
