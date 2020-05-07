@@ -95,6 +95,7 @@ if __name__ == '__main__':
     cns_wrk_mecat_dir = os.path.join(cns_wrk_dir, 'mecat')
     cns_wrk_split_dir = os.path.join(cns_wrk_dir, 'split')
     cns_wrk_ref_dir = os.path.join(cns_wrk_dir, 'ref')
+    out_paf_path = os.path.join(mummer_dir, 'out.paf')
 
     os.makedirs(wrk_dir, exist_ok=True)
     os.makedirs(mecat_ctg_dir, exist_ok=True)
@@ -207,8 +208,7 @@ if __name__ == '__main__':
     #show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
     #import script.parse_nucmer_align
     #script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
-
-    out_paf_path = os.path.join(mummer_dir, 'out.paf')
+    
     # convert
     with open(out_paf_path, 'w') as paf_f:
         subprocess.run([k8_cmd,
@@ -217,7 +217,7 @@ if __name__ == '__main__':
                         os.path.join(mummer_dir, 'out.delta')],
                        cwd=mummer_dir,
                        stdout=paf_f)
-
+    
     import script.paf2aln
 
     script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)

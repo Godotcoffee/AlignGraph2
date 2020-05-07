@@ -41,6 +41,8 @@ def split_pre_process(ctg_path, ref_path, aln_path, dir_path, out_path):
                     ctg_seq.append(ctg[ctg_list[i]])
                 SeqIO.write(ctg_seq, os.path.join(to_dir, 'ctg.fasta'), 'fasta')
                 for f in file_list:
+                    if os.path.exists(os.path.join(to_dir, f)):
+                        os.remove(os.path.join(to_dir, f))
                     os.symlink(os.path.abspath(os.path.join(dir_path, f)), os.path.join(to_dir, f))
                 with open(os.path.join(to_dir, 'config.txt'), 'w') as co:
                     co.write('{}\n'.format(ref_id))
@@ -89,4 +91,5 @@ def merge_out(sp_dir, mg_dir):
                     seq = next(SeqIO.parse(os.path.join(sp_dir, d, ctg), 'fasta'))
                     seq.id = d + '_' +  seq.id
                     SeqIO.write(seq, os.path.join(mg_dir, '{}_{}'.format(d, ctg)), 'fasta')
+
 
