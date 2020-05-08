@@ -182,45 +182,50 @@ if __name__ == '__main__':
     
     # Contig to Ref
     print('Contig to Ref...')
-
-    # nucmer
-    subprocess.run([nucmer_cmd,
-                    '-t', str(thread_num),
-                    #'-l', '100',
-                    #'-c', '1000',
-                    '-g', '100',
-                    '--banded',
-                    ref_path,
-                    ctg_path],
-                   cwd=mummer_dir)
-
-    # delta-filter
-    #out_filter_path = os.path.join(mummer_dir, 'out.filter.delta')
-    #with open(out_filter_path, 'w') as filter_f:
-    #    subprocess.run([delta_fileter_cmd,
-    #                    '-q',
-    #                    '-r',
-    #                    os.path.join(mummer_dir, 'out.delta')],
-    #                   cwd=mummer_dir,
-    #                   stdout=filter_f)
+    c_to_r_mode = 'NUCMER'
     
-    # convert
-    #show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
-    #import script.parse_nucmer_align
-    #script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
-    
-    # convert
-    with open(out_paf_path, 'w') as paf_f:
-        subprocess.run([k8_cmd,
-                        paf_tools,
-                        'delta2paf',
-                        os.path.join(mummer_dir, 'out.delta')],
-                       cwd=mummer_dir,
-                       stdout=paf_f)
-    
-    import script.paf2aln
+    if c_to_r_mode == 'NUCMER':
+        # nucmer
+        subprocess.run([nucmer_cmd,
+                        '-t', str(thread_num),
+                        #'-l', '100',
+                        #'-c', '1000',
+                        '-g', '100',
+                        '--banded',
+                        ref_path,
+                        ctg_path],
+                    cwd=mummer_dir)
 
-    script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)
+        # delta-filter
+        #out_filter_path = os.path.join(mummer_dir, 'out.filter.delta')
+        #with open(out_filter_path, 'w') as filter_f:
+        #    subprocess.run([delta_fileter_cmd,
+        #                    '-q',
+        #                    '-r',
+        #                    os.path.join(mummer_dir, 'out.delta')],
+        #                   cwd=mummer_dir,
+        #                   stdout=filter_f)
+        
+        # convert
+        #show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
+        #import script.parse_nucmer_align
+        #script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
+        
+        # convert
+        with open(out_paf_path, 'w') as paf_f:
+            subprocess.run([k8_cmd,
+                            paf_tools,
+                            'delta2paf',
+                            os.path.join(mummer_dir, 'out.delta')],
+                        cwd=mummer_dir,
+                        stdout=paf_f)
+        
+        import script.paf2aln
+
+        script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)
+    else:
+        import script.long2ref
+        script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
 
     print('Done')
 
