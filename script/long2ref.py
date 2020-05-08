@@ -72,5 +72,4 @@ def long2ref(mecat_cmd, ctg_path, ref_path, wrk_dir, thread_num, out_path):
 
 
 if __name__ == "__main__":
-    long2ref('/rhome/huangs/Github/AlignGraph2/mecat_plus/MECAT-master_1/Linux-amd64/bin/mecat2ref',
-         sys.argv[1], sys.argv[2], sys.argv[3], 16, sys.argv[4])
+    pass
