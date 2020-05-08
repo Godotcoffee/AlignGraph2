@@ -195,7 +195,7 @@ if __name__ == '__main__':
     print('Contig to Ref...')
     c_to_r_mode = 'NUCMER'
     
-    if c_to_r_mode == 'NUCMER':
+    if c_to_r_mode == 'NUCMER' or not os.path.exists(mecat_ref2_cmd):
         # nucmer
         subprocess.run([nucmer_cmd,
                         '-t', str(thread_num),
