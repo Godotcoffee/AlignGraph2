@@ -51,14 +51,14 @@ def long2ref(mecat_cmd, ctg_path, ref_path, wrk_dir, thread_num, out_path):
                    cwd=wrk_dir)
 
     if ret.returncode == 0:
-            import filter
-            filter.filter_error(tmp_ref_path, tmp_ref2_path)
+        import script.filter
+        script.filter.filter_error(tmp_ref_path, tmp_ref2_path)
     
     with open(tmp_ref2_path) as in_ref, open(out_path, 'w') as out_ref:
         for line in in_ref:
             if line and line[0].isdigit():
                 sp = line.split()
-                o_id = new_seq_list[int(sp[0])].id
+                o_id = new_seq_list[int(sp[0]) - 1].id
                 sp2 = o_id.split('_')
                 oseq_id = idx_id[int(sp2[0])]
                 oseq_len = id_len[oseq_id]
