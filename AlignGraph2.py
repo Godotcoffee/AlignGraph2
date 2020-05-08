@@ -102,6 +102,17 @@ if __name__ == '__main__':
     os.makedirs(mecat_ref_dir, exist_ok=True)
     os.makedirs(mummer_dir, exist_ok=True)
     os.makedirs(mummer_tmp_dir, exist_ok=True)
+    try:
+        if os.path.exists(sp_input_dir):
+            shutil.rmtree(sp_input_dir)
+        if os.path.exists(pagraph_dir):
+            shutil.rmtree(pagraph_dir)
+        if os.path.exists(pagraph_m_dir):
+            shutil.rmtree(pagraph_m_dir)
+        if os.path.exists(cns_dir):
+            shutil.rmtree(cns_dir)
+    except:
+        pass
     os.makedirs(input_dir, exist_ok=True)
     os.makedirs(sp_input_dir, exist_ok=True)
     os.makedirs(pagraph_dir, exist_ok=True)
@@ -241,7 +252,7 @@ if __name__ == '__main__':
                     '-o', input_dir])
 
     print('Done')
-
+    
     # split
     import script.split_helper
     script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
