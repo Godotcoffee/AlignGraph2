@@ -262,8 +262,8 @@ if __name__ == '__main__':
 
     for d in os.listdir(sp_input_dir):
         in_dir = os.path.join(sp_input_dir, d)
-        out_dir = os.path.join(pagraph_dir, d)
-        os.makedirs(out_dir, exist_ok=True)
+        tmp_out_dir = os.path.join(pagraph_dir, d)
+        os.makedirs(tmp_out_dir, exist_ok=True)
 
         #if os.path.isfile(os.path.join(out_dir, 'DONE')):
         #    print('Ignore {}'.format(d))
@@ -282,10 +282,10 @@ if __name__ == '__main__':
             '-R', p_ref_path,
             '-p', in_dir,
             '-a', p_aln_path,
-            '-o', out_dir
+            '-o', tmp_out_dir
         ])
 
-        with open(os.path.join(out_dir, 'DONE'), 'w'):
+        with open(os.path.join(tmp_out_dir, 'DONE'), 'w'):
             pass
 
     #subprocess.run([pagraph_cmd,
