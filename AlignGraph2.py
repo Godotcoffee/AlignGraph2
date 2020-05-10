@@ -193,7 +193,7 @@ if __name__ == '__main__':
     
     # Contig to Ref
     print('Contig to Ref...')
-    c_to_r_mode = 'NUCMER'
+    c_to_r_mode = 'MECAT'
     
     if c_to_r_mode == 'NUCMER' or not os.path.exists(mecat_ref2_cmd):
         # nucmer
