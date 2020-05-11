@@ -26,6 +26,8 @@ if __name__ == '__main__':
                         help='thread number')
     parser.add_argument('--clean', required=False, action='store_true',
                         help='clean file after running')
+    parser.add_argument('--plus', required=False, action='store_true', default=False,
+                        help='Use MECAT+ as alignment algorithm')
 
     if len(sys.argv) <= 1:
         parser.print_help(file=sys.stderr)
@@ -34,6 +36,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     start_time = time.time()
+
+    aligned_mode = 'MECAT' if args.plus else 'NUCMER'
+    #print(aligned_mode)
 
     # Input
     read_path = os.path.realpath(args.read)
@@ -156,29 +161,31 @@ if __name__ == '__main__':
     # Read to Ref
     print('Read to Ref...')
     okok = False
-    try:
-        #if os.path.exists(read_to_ref_path):
-        #    os.remove(read_to_ref_path)
-        #if os.path.exists(read_to_ref2_path):
-        #    os.remove(read_to_ref2_path)
-        #print(mecat_ref2_cmd)
-        ret = subprocess.run([mecat_ref2_cmd,
-                    '-t', str(thread_num),
-                    '-d', read_path,
-                    '-r', ref_path,
-                    '-b', str(1),
-                    '-w', './wrk',
-                    '-o', 'dummy',
-                    '-p', read_to_ref2_path],
-                   cwd=mecat_ref_dir)
-        #print(ret.returncode)
-                   
-        if ret.returncode == 0:
-            import script.filter
-            script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
-            okok = True
-    except:
-        pass
+    
+    if aligned_mode == 'MECAT':
+        try:
+            #if os.path.exists(read_to_ref_path):
+            #    os.remove(read_to_ref_path)
+            #if os.path.exists(read_to_ref2_path):
+            #    os.remove(read_to_ref2_path)
+            #print(mecat_ref2_cmd)
+            ret = subprocess.run([mecat_ref2_cmd,
+                        '-t', str(thread_num),
+                        '-d', read_path,
+                        '-r', ref_path,
+                        '-b', str(1),
+                        '-w', './wrk',
+                        '-o', 'dummy',
+                        '-p', read_to_ref2_path],
+                    cwd=mecat_ref_dir)
+            #print(ret.returncode)
+                    
+            if ret.returncode == 0:
+                import script.filter
+                script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
+                okok = True
+        except:
+            pass
 
     if not okok:
         subprocess.run([mecat_ref_cmd,
@@ -193,9 +200,8 @@ if __name__ == '__main__':
     
     # Contig to Ref
     print('Contig to Ref...')
-    c_to_r_mode = 'MECAT'
     
-    if c_to_r_mode == 'NUCMER' or not os.path.exists(mecat_ref2_cmd):
+    if aligned_mode != 'MECAT' or not os.path.exists(mecat_ref2_cmd):
         # nucmer
         subprocess.run([nucmer_cmd,
                         '-t', str(thread_num),
