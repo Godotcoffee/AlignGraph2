@@ -201,7 +201,18 @@ if __name__ == '__main__':
     # Contig to Ref
     print('Contig to Ref...')
     
-    if aligned_mode != 'MECAT' or not os.path.exists(mecat_ref2_cmd):
+    #if aligned_mode != 'MECAT' or not os.path.exists(mecat_ref2_cmd):
+    okok2 = False
+
+    if os.path.exists(mecat_ref2_cmd):
+        try:
+            import script.long2ref
+            script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
+            okok2 = True
+        except:
+            pass
+
+    if okok2 == False:
         # nucmer
         subprocess.run([nucmer_cmd,
                         '-t', str(thread_num),
@@ -240,9 +251,9 @@ if __name__ == '__main__':
         import script.paf2aln
 
         script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)
-    else:
-        import script.long2ref
-        script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
+    #else:
+    #    import script.long2ref
+    #    script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
 
     print('Done')
 
