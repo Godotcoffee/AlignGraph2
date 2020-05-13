@@ -14,20 +14,32 @@ if __name__ == '__main__':
                         help='read path')
     parser.add_argument('-c', '--contig', required=True, type=str, default=argparse.SUPPRESS,
                         help='contig path')
-    parser.add_argument('-R', '--ref', required=True, type=str, default=argparse.SUPPRESS,
+    parser.add_argument('-g', '--genome', required=True, type=str, default=argparse.SUPPRESS,
                         help='reference path')
     parser.add_argument('-o', '--output', required=True, type=str, default=argparse.SUPPRESS,
                         help='output directory')
+    parser.add_argument('-m', required=False, action='store_true', default=False,
+                        help='customized alignment algorithm mecat2ref+')
+    parser.add_argument('-b', required=False, type=int, default=200,
+                        help='size of similar genome blocks for mecat2ref+')
+    parser.add_argument('--alpha', required=False, type=float, default=0.5,
+                        help='lower bound of k-mer scoring function for mecat2ref+')
+    parser.add_argument('--beta', required=False, type=float, default=2.0,
+                        help='upper bound of k-mer scoring function for mecat2ref+')
     parser.add_argument('-k', required=False, type=int, default=14,
                         help='size of k-mer')
-    parser.add_argument('--ratio', required=False, type=float, default=0.2,
-                        help='threshold of solid k-mer set')
+    #parser.add_argument('--ratio', required=False, type=float, default=0.2,
+    #                    help='threshold of solid k-mer set')
+    parser.add_argument('--epsilon', required=False, type=int, default=10,
+                        help='distance to join two vertices in A-Bruijn graph')
+    parser.add_argument('-l', required=False, type=int, default=50,
+                        help='size of long read for graph traversal')
+    parser.add_argument('-a', required=False, type=int, default=10000,
+                        help='size of long read blocks for consensus')
     parser.add_argument('-t', '--thread', required=False, type=int, default=16,
                         help='thread number')
-    parser.add_argument('--clean', required=False, action='store_true',
-                        help='clean file after running')
-    parser.add_argument('--plus', required=False, action='store_true', default=False,
-                        help='Use MECAT+ as alignment algorithm')
+    #parser.add_argument('--clean', required=False, action='store_true',
+    #                    help='clean file after running')
 
     if len(sys.argv) <= 1:
         parser.print_help(file=sys.stderr)
@@ -37,16 +49,22 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    aligned_mode = 'MECAT' if args.plus else 'NUCMER'
+    aligned_mode = 'MECAT' if args.m else 'NUCMER'
     #print(aligned_mode)
 
     # Input
     read_path = os.path.realpath(args.read)
     ctg_path = os.path.realpath(args.contig)
-    ref_path = os.path.realpath(args.ref)
+    ref_path = os.path.realpath(args.genome)
     out_dir = os.path.realpath(args.output)
     k = args.k
-    ratio = args.ratio
+    block1 = args.b
+    lower_score = args.alpha
+    uppser_score = args.beta
+    err_dist = args.epsilon
+    min_len = args.l
+    block2 = args.a
+    #ratio = args.ratio
     thread_num = args.thread
 
     # Get root
@@ -142,8 +160,9 @@ if __name__ == '__main__':
                     '-t', str(thread_num),
                     '-i', read_path,
                     '-o', solid_kmer_path,
-                    '-k', str(k),
-                    '-m', str(ratio)])
+                    '-k', str(k)
+                    #'-m', str(ratio)
+                    ])
     print('Done')
 
     # Read to Contig
@@ -273,7 +292,7 @@ if __name__ == '__main__':
     # split
     import script.split_helper
     script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
-
+    
     # pagraph
     print('PAGraph...')
 
@@ -299,7 +318,9 @@ if __name__ == '__main__':
             '-R', p_ref_path,
             '-p', in_dir,
             '-a', p_aln_path,
-            '-o', tmp_out_dir
+            '-o', tmp_out_dir,
+            '-r', str(min_len),
+            '--epsilon', str(err_dist)
         ])
 
         with open(os.path.join(tmp_out_dir, 'DONE'), 'w'):
@@ -349,7 +370,8 @@ if __name__ == '__main__':
 
     # Correct
     print('Correct...')
-    part_len = 10000
+    #part_len = 10000
+    part_len = block2
     top_k = 3000
 
     fasta_cor_path_list = list()
