@@ -46,7 +46,7 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/referenc
 
 `-k [int]`, size of k-mers in A-Bruijn graph (default: 14)
 
-`--epsilon [int]`, distance to join two vertices in A-Bruijn graph (default: 20)
+`--epsilon [int]`, distance to join two vertices in A-Bruijn graph (default: 10)
 
 `-l [int]`, minimum path length for graph traversal (default: 50)
 
