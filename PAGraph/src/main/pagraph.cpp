@@ -78,6 +78,8 @@ int run2(int argc, char* argv[])
     args::ValueFlag<std::string> preArg(parser, "path", "pre process directory", {'p', "pre_process"});
     args::ValueFlag<std::string> ctgToRefArg(parser, "path", "alignment path of contig to reference", {'a', "aln"});
     args::ValueFlag<std::string> outArg(parser, "path", "output directory", {'o', "output"});
+    args::ValueFlag<std::size_t> minLenArg(parser, "len", "minimum path length", {'l', "length"}, 50);
+    args::ValueFlag<std::size_t> devArg(parser, "dist", "distance to join vertices", {"epsilon"}, 20);
 
     if (argc <= 1) {
         std::cerr << parser;
@@ -114,9 +116,11 @@ int run2(int argc, char* argv[])
     double ctgToRefRatio = 0.00;
     double ctgToRefTotalRatio = 0.1;
     std::size_t ctgToRefMinLen = 50;
-    std::size_t posError = 10;
+    //std::size_t posError = 10;
+    std::size_t posError = args::get(devArg) / 2;
     double errorRate = 0.15;
     double startSplit = 0.90;
+    auto minLen = args::get(minLenArg);
 
     std::cout << "Loading config.txt" << std::endl;
 
@@ -244,6 +248,7 @@ int run2(int argc, char* argv[])
                 posError * 2,
                 errorRate,
                 startSplit,
+                minLen,
                 threadNum
         );
 

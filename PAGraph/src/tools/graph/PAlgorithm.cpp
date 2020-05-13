@@ -142,7 +142,7 @@ PAlgorithm::appendSeq(PAlgorithm::TravelSequence &base, const PAlgorithm::Travel
 }
 
 PAlgorithm::TravelSequence
-PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviation, double errorRate, double startSplit) {
+PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviation, double errorRate, double startSplit, std::size_t minLen) {
     const std::size_t paNodeTopK = std::min(_threadNum, 8U);
 
     std::set<PABruijnGraph::PANode::UniqueType> globalUniqueTable;
@@ -247,6 +247,8 @@ PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviati
             auto &seq = seqResult[i];
             auto len = seqSize(seq);
             //std::cout << " " << len << std::endl;
+
+            if (minLen > 0 && seqSize(seq) < minLen) { continue; }
 
             leap = seq.back().first.getPosition().first != 0 &&
                    _pCtgMapper->singleToDual(seq.back().first.getPosition().first).first != chosenOne;

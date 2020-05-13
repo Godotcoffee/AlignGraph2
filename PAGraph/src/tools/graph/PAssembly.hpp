@@ -33,6 +33,7 @@ public:
             std::size_t deviation,
             double errorRate,
             double startSplit,
+            std::size_t minLen,
             unsigned threadNum);
 };
 

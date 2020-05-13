@@ -15,7 +15,7 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
                        std::shared_ptr<const PositionMapper> pCtgMapper,
                        std::shared_ptr<const PositionMapper> pRefMapper,
                        const std::set<std::pair<std::string, bool>> &ctgSet, std::size_t deviation, double errorRate,
-                       double startSplit, unsigned threadNum) {
+                       double startSplit, std::size_t minLen, unsigned threadNum) {
 
     std::set<std::pair<std::string, bool>> successCtgSet;
 
@@ -35,7 +35,7 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
         std::cout << "[Travel] " << ctgIdx << " - " << (*pContigDB)[ctgIdx].name() << " - " << (*pContigDB)[ctgIdx].size() << std::endl;
         //for (int j = 0; j < 2; ++j) {
         std::cout << "[Travel] " << (ctgOffset == 0 ? "forward" : "reverse") << std::endl;
-        results[2 * ctgIdx + ctgOffset] = algo.travelSequence(ctgIdx, ctgOffset == 0, deviation, errorRate, startSplit);
+        results[2 * ctgIdx + ctgOffset] = algo.travelSequence(ctgIdx, ctgOffset == 0, deviation, errorRate, startSplit, minLen);
 
         std::ofstream of(outDir + "/" + prefix
                          + std::to_string(ctgIdx) + "_" + std::to_string(ctgOffset) + ".txt");

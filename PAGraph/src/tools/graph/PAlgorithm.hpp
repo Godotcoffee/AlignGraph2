@@ -119,7 +119,7 @@ public:
             unsigned int threadNum);
 
     TravelSequence travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviation, double errorRate,
-                                  double startSplit);
+                                  double startSplit, std::size_t minLen = 0);
 
     std::string seqToString(const TravelSequence &seq, std::size_t deviation,
                             double errorRate, std::size_t ctgStartPos = 0);
