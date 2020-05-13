@@ -248,10 +248,10 @@ PAlgorithm::travelSequence(std::size_t ctgIdx, bool forward, std::size_t deviati
             auto len = seqSize(seq);
             //std::cout << " " << len << std::endl;
 
-            if (minLen > 0 && seqSize(seq) < minLen) { continue; }
-
             leap = seq.back().first.getPosition().first != 0 &&
                    _pCtgMapper->singleToDual(seq.back().first.getPosition().first).first != chosenOne;
+
+            if (!leap && i > 0 && minLen > 0 && seqSize(seq) < minLen) { continue; }
 
             if (len > maxLen || leap) {
                 maxLen = len;
