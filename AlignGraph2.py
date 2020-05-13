@@ -10,33 +10,33 @@ if __name__ == '__main__':
         description='AlignGraph2', formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('--version', action='version', version='%(prog)s 1.0beta')
-    parser.add_argument('-r', '--read', required=True, type=str, default=argparse.SUPPRESS,
+    parser.add_argument('-r', '--read', metavar='[fastq/fasta]', required=True, type=str, default=argparse.SUPPRESS,
                         help='read path')
-    parser.add_argument('-c', '--contig', required=True, type=str, default=argparse.SUPPRESS,
+    parser.add_argument('-c', '--contig', metavar='[fasta]', required=True, type=str, default=argparse.SUPPRESS,
                         help='contig path')
-    parser.add_argument('-g', '--genome', required=True, type=str, default=argparse.SUPPRESS,
+    parser.add_argument('-g', '--genome', metavar='[fasta]', required=True, type=str, default=argparse.SUPPRESS,
                         help='reference path')
-    parser.add_argument('-o', '--output', required=True, type=str, default=argparse.SUPPRESS,
+    parser.add_argument('-o', '--output', metavar='[dir]', required=True, type=str, default=argparse.SUPPRESS,
                         help='output directory')
     parser.add_argument('-m', required=False, action='store_true', default=False,
                         help='customized alignment algorithm mecat2ref+')
-    parser.add_argument('-b', required=False, type=int, default=200,
+    parser.add_argument('-b', metavar='[int]', required=False, type=int, default=200,
                         help='size of similar genome blocks for mecat2ref+')
-    parser.add_argument('--alpha', required=False, type=float, default=0.5,
+    parser.add_argument('--alpha', metavar='[real]', required=False, type=float, default=0.5,
                         help='lower bound of k-mer scoring function for mecat2ref+')
-    parser.add_argument('--beta', required=False, type=float, default=2.0,
+    parser.add_argument('--beta', metavar='[real]', required=False, type=float, default=2.0,
                         help='upper bound of k-mer scoring function for mecat2ref+')
-    parser.add_argument('-k', required=False, type=int, default=14,
+    parser.add_argument('-k', metavar='[int]', required=False, type=int, default=14,
                         help='size of k-mer')
     #parser.add_argument('--ratio', required=False, type=float, default=0.2,
     #                    help='threshold of solid k-mer set')
-    parser.add_argument('--epsilon', required=False, type=int, default=10,
+    parser.add_argument('--epsilon', metavar='[int]', required=False, type=int, default=10,
                         help='distance to join two vertices in A-Bruijn graph')
-    parser.add_argument('-l', required=False, type=int, default=50,
+    parser.add_argument('-l', metavar='[int]', required=False, type=int, default=50,
                         help='size of long read for graph traversal')
-    parser.add_argument('-a', required=False, type=int, default=10000,
+    parser.add_argument('-a', metavar='[int]', required=False, type=int, default=10000,
                         help='size of long read blocks for consensus')
-    parser.add_argument('-t', '--thread', required=False, type=int, default=16,
+    parser.add_argument('-t', '--thread', metavar='[int]', required=False, type=int, default=16,
                         help='thread number')
     #parser.add_argument('--clean', required=False, action='store_true',
     #                    help='clean file after running')
@@ -292,7 +292,7 @@ if __name__ == '__main__':
     # split
     import script.split_helper
     script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
-    
+
     # pagraph
     print('PAGraph...')
 
