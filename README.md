@@ -1,8 +1,6 @@
 ## Introduction
 
-AlignGraph2 is a software improved from [AlignGraph][aligngraph] that 
-joins contigs generated from long reads by reassembling them with 
-guidance of a reference genome of a closely related species.
+AlignGraph2 is the second version of [AlignGraph][aligngraph] for PacBio long reads. It extends and refines contigs assembled from  the long reads with a published genome similar to the sequencing genome.
 
 ## Requirements
 
@@ -24,22 +22,36 @@ cd AlignGraph2 && python ./install.py
 ### Quick Start
 
 ```sh
-python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -R /path/to/reference -o /path/to/output
+python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/reference -o /path/to/output
 ```
 
-### Options
-`-r, --read [fastq/fasta]`, reads file
+### Mandatory
+`-r, --read [fastq/fasta]`, long read file
 
-`-c, --contig [fasta]`, contigs file
+`-c, --contig [fasta]`, contig file
 
-`-R, --ref [fasta]`, reference genome file
+`-g, --genome [fasta]`, similar genome file
 
 `-o, --output [dir]`, output directory
 
-`-k [size]`, size of k-mer (default: 14)
+### Options
 
-`--ratio [threshold]`, threshold of solid k-mer set (default: 0.2)
+`-m`, customized alignment algorithm mecat2ref+ (default: none)
 
-`-t --thread`, number of thread (default: 16)
+`-b [int]`, size of similar genome blocks for mecat2ref+ (default: 200)
+
+`--alpha [real]`, lower bound of k-mer scoring function for mecat2ref+ (default: 0.5)
+
+`--beta [real]`, upper bound of k-mer scoring function for mecat2ref+ (default: 2.0)
+
+`-k [int]`, size of k-mers in A-Bruijn graph (default: 14)
+
+`--epsilon [int]`, distance to join two vertices in A-Bruijn graph (default: 20)
+
+`-l [int]`, minimum path length for graph traversal (default: 50)
+
+`-a [int]`, size of long read blocks for consensus (default: 10,000)
+
+`-t --thread [int]`, number of threads (default: 16)
 
 [aligngraph]: https://github.com/baoe/AlignGraph
