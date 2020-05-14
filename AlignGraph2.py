@@ -195,7 +195,10 @@ if __name__ == '__main__':
                         '-b', str(1),
                         '-w', './wrk',
                         '-o', 'dummy',
-                        '-p', read_to_ref2_path],
+                        '-p', read_to_ref2_path,
+                        '-l', str(lower_score),
+                        '-u', str(uppser_score),
+                        '-z', str(block2)],
                     cwd=mecat_ref_dir)
             #print(ret.returncode)
                     
