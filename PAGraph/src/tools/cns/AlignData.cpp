@@ -76,7 +76,7 @@ AlignData::readFromRefFile(const std::string &filePath, const std::string &skele
     return part;
 }
 
-std::vector<std::size_t> AlignData::weightAln(const std::vector<std::pair<dagcon::Alignment, unsigned>> &alignment) {
+std::vector<std::size_t> AlignData::weightAln(const std::vector<std::pair<dagcon::Alignment, unsigned>> &alignment, std::size_t alpha) {
     if (alignment.empty()) {
         return {};
     }
@@ -96,7 +96,7 @@ std::vector<std::size_t> AlignData::weightAln(const std::vector<std::pair<dagcon
     weights.reserve(alignment.size());
     for (auto &aln : alignment) {
         weights.push_back(
-                std::max(static_cast<std::size_t>((aln.second - minScore) * 1.0 / std::max(scoreRange, 1U) * 250), std::size_t(0))
+                std::max(static_cast<std::size_t>((aln.second - minScore) * 1.0 / std::max(scoreRange, 1U) * alpha), std::size_t(1))
         );
     }
 

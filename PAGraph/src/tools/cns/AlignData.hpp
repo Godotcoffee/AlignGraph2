@@ -18,7 +18,7 @@ public:
     static std::vector<std::vector<std::pair<dagcon::Alignment, unsigned>>>
     readFromRefFile(const std::string &filePath, const std::string &skeleton, std::size_t partLen);
 
-    static std::vector<std::size_t> weightAln(const std::vector<std::pair<dagcon::Alignment, unsigned>> &alignment);
+    static std::vector<std::size_t> weightAln(const std::vector<std::pair<dagcon::Alignment, unsigned>> &alignment, std::size_t alpha = 250);
 };
 
 
