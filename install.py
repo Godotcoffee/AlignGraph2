@@ -10,6 +10,15 @@ if __name__ == '__main__':
     total_start_time = time.time()
     root_dir = os.path.dirname(os.path.realpath(__file__))
     log_path = os.path.join(root_dir, 'build.log')
+
+    uname = os.uname()
+    mecat_ref_cmd = os.path.join(root_dir, 'thirdparty', 'mecat',
+                                '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
+                                'bin', 'mecat2ref')
+    mecat_ref2_cmd = os.path.join(root_dir, 'mecat_plus', 'MECAT-master_1',
+                                 '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
+                                 'bin', 'mecat2ref')
+
     with open(log_path, 'w') as log_f:
         pass    # Clear file
     print('Log file is located in {}'.format(log_path))
@@ -86,9 +95,10 @@ if __name__ == '__main__':
                              stderr=subprocess.STDOUT,
                              cwd=mecat_dir)
 
-        if ret.returncode != 0:
-            print('Failed to build mecat, please check {}'.format(log_f.name))
+        if not os.path.exists(mecat_ref_cmd):
+            print('Failed to build mecat2ref, please check {}'.format(log_f.name))
             exit(1)
+        
         try:
             ret = subprocess.run(['make', '-j4'],
                                 stdout=log_f,
@@ -96,6 +106,9 @@ if __name__ == '__main__':
                                 cwd=mecat_p_dir)
         except:
             pass
+
+        if not os.path.exists(mecat_ref2_cmd):
+            print('Warning: failed to build mecat+')
 
         print('# End of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
