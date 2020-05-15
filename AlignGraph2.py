@@ -10,7 +10,7 @@ if __name__ == '__main__':
         description='AlignGraph2', formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('--version', action='version', version='%(prog)s 1.0beta')
-    parser.add_argument('-r', '--read', metavar='[fastq/fasta]', required=True, type=str, default=argparse.SUPPRESS,
+    parser.add_argument('-r', '--read', metavar='[fastq]', required=True, type=str, default=argparse.SUPPRESS,
                         help='read path')
     parser.add_argument('-c', '--contig', metavar='[fasta]', required=True, type=str, default=argparse.SUPPRESS,
                         help='contig path')

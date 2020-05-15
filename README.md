@@ -26,7 +26,7 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/referenc
 ```
 
 ### Mandatory
-`-r, --read [fastq/fasta]`, long read file
+`-r, --read [fastq]`, long read file
 
 `-c, --contig [fasta]`, contig file
 
