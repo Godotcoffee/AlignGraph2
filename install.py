@@ -10,6 +10,7 @@ if __name__ == '__main__':
     total_start_time = time.time()
     root_dir = os.path.dirname(os.path.realpath(__file__))
     log_path = os.path.join(root_dir, 'build.log')
+    build_thread = 4
 
     uname = os.uname()
     mecat_ref_cmd = os.path.join(root_dir, 'thirdparty', 'mecat',
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         print('# Begin of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
 
-        ret = subprocess.run(['make', '-j4'],
+        ret = subprocess.run(['make', '-j{}'.format(build_thread)],
                              stdout=log_f,
                              stderr=subprocess.STDOUT,
                              cwd=os.path.join(pagraph_dir, 'build'))
@@ -90,7 +91,7 @@ if __name__ == '__main__':
         print('# Begin of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
 
-        ret = subprocess.run(['make', '-j4'],
+        ret = subprocess.run(['make', '-j{}'.format(build_thread)],
                              stdout=log_f,
                              stderr=subprocess.STDOUT,
                              cwd=mecat_dir)
@@ -100,7 +101,7 @@ if __name__ == '__main__':
             exit(1)
         
         try:
-            ret = subprocess.run(['make', '-j4'],
+            ret = subprocess.run(['make', '-j{}'.format(build_thread)],
                                 stdout=log_f,
                                 stderr=subprocess.STDOUT,
                                 cwd=mecat_p_dir)
@@ -154,7 +155,7 @@ if __name__ == '__main__':
         print('# Begin of make', file=log_f, flush=True)
         print('#', file=log_f, flush=True)
 
-        ret = subprocess.run(['make', '-j4'],
+        ret = subprocess.run(['make', '-j{}'.format(build_thread)],
                              stdout=log_f,
                              stderr=subprocess.STDOUT,
                              cwd=mummer_dir)
