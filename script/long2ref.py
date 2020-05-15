@@ -6,7 +6,7 @@ import sys
 import os
 import subprocess
 
-def long2ref(mecat_cmd, ctg_path, ref_path, wrk_dir, thread_num, out_path):
+def long2ref(mecat_cmd, mecat_cmd2, ctg_path, ref_path, wrk_dir, thread_num, out_path):
     split_len = 10000
     seq_cnt = 0
     
@@ -40,19 +40,29 @@ def long2ref(mecat_cmd, ctg_path, ref_path, wrk_dir, thread_num, out_path):
     tmp_ref_path = os.path.join(wrk_dir, 'mecat.ref')
     tmp_ref2_path = os.path.join(wrk_dir, 'mecat.x.ref')
 
-    ret = subprocess.run([mecat_cmd,
-                    '-t', str(thread_num),
-                    '-d', tmp_read_path,
-                    '-r', ref_path,
-                    '-b', str(1),
-                    '-w', './wrk',
-                    '-o', 'dummy',
-                    '-p', tmp_ref_path],
-                   cwd=wrk_dir)
+    if os.path.exists(mecat_cmd):
+        ret = subprocess.run([mecat_cmd,
+                        '-t', str(thread_num),
+                        '-d', tmp_read_path,
+                        '-r', ref_path,
+                        '-b', str(1),
+                        '-w', './wrk',
+                        '-o', 'dummy',
+                        '-p', tmp_ref_path],
+                    cwd=wrk_dir)
 
-    if ret.returncode == 0:
-        import script.filter
-        script.filter.filter_error(tmp_ref_path, tmp_ref2_path)
+        if ret.returncode == 0:
+            import script.filter
+            script.filter.filter_error(tmp_ref_path, tmp_ref2_path)
+    else:
+        ret = subprocess.run([mecat_cmd2,
+                        '-t', str(thread_num),
+                        '-d', tmp_read_path,
+                        '-r', ref_path,
+                        '-b', str(1),
+                        '-w', './wrk',
+                        '-o', tmp_ref2_path],
+                    cwd=wrk_dir)
     
     with open(tmp_ref2_path) as in_ref, open(out_path, 'w') as out_ref:
         for line in in_ref:

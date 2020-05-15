@@ -226,13 +226,13 @@ if __name__ == '__main__':
     #if aligned_mode != 'MECAT' or not os.path.exists(mecat_ref2_cmd):
     okok2 = False
 
-    if os.path.exists(mecat_ref2_cmd):
-        try:
-            import script.long2ref
-            script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
-            okok2 = True
-        except:
-            pass
+   
+    try:
+        import script.long2ref
+        script.long2ref.long2ref(mecat_ref2_cmd, mecat_ref_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
+        okok2 = True
+    except:
+        pass
 
     if okok2 == False:
         # nucmer
