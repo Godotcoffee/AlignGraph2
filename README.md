@@ -26,6 +26,7 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/referenc
 ```
 
 ### Mandatory
+
 `-r, --read [fastq]`, long read file
 
 `-c, --contig [fasta]`, contig file
@@ -52,6 +53,6 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/referenc
 
 `-a [int]`, size of long read blocks for consensus (default: 10,000)
 
-`-t --thread [int]`, number of threads (default: 16)
+`-t [int]`, number of threads (default: 16)
 
 [aligngraph]: https://github.com/baoe/AlignGraph

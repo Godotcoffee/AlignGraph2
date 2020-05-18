@@ -21,22 +21,22 @@ if __name__ == '__main__':
     parser.add_argument('-m', required=False, action='store_true', default=False,
                         help='customized alignment algorithm mecat2ref+')
     parser.add_argument('-b', metavar='[int]', required=False, type=int, default=200,
-                        help='size of similar genome blocks for mecat2ref+')
+                        help='size of similar genome blocks for mecat2ref+ [50-1000]')
     parser.add_argument('--alpha', metavar='[real]', required=False, type=float, default=0.5,
-                        help='lower bound of k-mer scoring function for mecat2ref+')
+                        help='lower bound of k-mer scoring function for mecat2ref+ [0-1]')
     parser.add_argument('--beta', metavar='[real]', required=False, type=float, default=2.0,
-                        help='upper bound of k-mer scoring function for mecat2ref+')
+                        help='upper bound of k-mer scoring function for mecat2ref+ [1-infinity]')
     parser.add_argument('-k', metavar='[int]', required=False, type=int, default=14,
-                        help='size of k-mer')
+                        help='size of k-mer [4-15]')
     #parser.add_argument('--ratio', required=False, type=float, default=0.2,
     #                    help='threshold of solid k-mer set')
     parser.add_argument('--epsilon', metavar='[int]', required=False, type=int, default=10,
-                        help='distance to join two vertices in A-Bruijn graph')
+                        help='distance to join two vertices in A-Bruijn graph [5-100]')
     parser.add_argument('-l', metavar='[int]', required=False, type=int, default=50,
-                        help='size of long read for graph traversal')
+                        help='minimum path length for graph traversal [0-infinity]')
     parser.add_argument('-a', metavar='[int]', required=False, type=int, default=10000,
-                        help='size of long read blocks for consensus')
-    parser.add_argument('-t', '--thread', metavar='[int]', required=False, type=int, default=16,
+                        help='size of long read blocks for consensus [100-100000]')
+    parser.add_argument('-t', metavar='[int]', required=False, type=int, default=16,
                         help='thread number')
     #parser.add_argument('--clean', required=False, action='store_true',
     #                    help='clean file after running')
@@ -65,7 +65,33 @@ if __name__ == '__main__':
     min_len = args.l
     block2 = args.a
     #ratio = args.ratio
-    thread_num = args.thread
+    thread_num = args.t
+
+    # Check ranges of arguments
+    if not 4 <= k <= 15:
+        print('Size of k-mer must be [4-15]', file=sys.stderr)
+        exit(1)
+    if not 50 <= block1 <= 1000:
+        print('Size of similar genome blocks must be [50-1000]', file=sys.stderr)
+        exit(1)
+    if not 0.0 <= lower_score <= 1.0:
+        print('Lower bound of k-mer scoring must be [0-1]', file=sys.stderr)
+        exit(1)
+    if not 1.0 <= uppser_score:
+        print('Upper bound of k-mer scoring must be >= 1', file=sys.stderr)
+        exit(1)
+    if not 5 <= err_dist <= 100:
+        print('Distance to join two vertices must be [5-100]', file=sys.stderr)
+        exit(1)
+    if not 0 <= min_len:
+        print('Minimum path length must not be negative', file=sys.stderr)
+        exit(1)
+    if not 100 <= block2 <= 100000:
+        print('Size of long read blocks must be [100-100000]', file=sys.stderr)
+        exit(1)
+    if not 0 <= thread_num:
+        print('Thread number must not be negative', file=sys.stderr)
+        exit(1)
 
     # Get root
     root_dir = os.path.dirname(os.path.realpath(__file__))
