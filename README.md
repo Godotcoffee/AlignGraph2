@@ -4,6 +4,8 @@ AlignGraph2 is the second version of [AlignGraph][aligngraph] for PacBio long re
 
 ## Requirements
 
+Linux OS 64-bit
+
 GCC >= 4.8.5
 
 CMake >= 3.1.0
@@ -11,6 +13,8 @@ CMake >= 3.1.0
 Python >= 3.6 with Biopython
 
 ## Installation
+
+We have tested `AlignGraph2` on CentOS release 7.6 with GCC 4.8.5.
 
 ```sh
 git clone --recursive https://github.com/Godotcoffee/AlignGraph2
