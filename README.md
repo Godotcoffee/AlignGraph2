@@ -14,8 +14,6 @@ Python >= 3.6 with Biopython
 
 ## Installation
 
-We have tested `AlignGraph2` on CentOS release 7.6 with GCC 4.8.5.
-
 ```sh
 git clone --recursive https://github.com/Godotcoffee/AlignGraph2
 cd AlignGraph2 && python ./install.py
@@ -26,7 +24,7 @@ cd AlignGraph2 && python ./install.py
 ### Quick Start
 
 ```sh
-python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/reference -o /path/to/output
+python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/genome -o /path/to/output
 ```
 
 ### Mandatory
