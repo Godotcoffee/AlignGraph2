@@ -15,7 +15,7 @@ Python >= 3.6 with Biopython
 ## Installation
 
 ```sh
-git clone --recursive https://github.com/Godotcoffee/AlignGraph2
+git clone --recursive https://github.com/Godotcoffee/AlignGraph2.git
 cd AlignGraph2 && python ./install.py
 ```
 
