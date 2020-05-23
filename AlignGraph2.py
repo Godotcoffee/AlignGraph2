@@ -26,6 +26,8 @@ if __name__ == '__main__':
                         help='lower bound of k-mer scoring function for mecat2ref+ [0-1]')
     parser.add_argument('--beta', metavar='[real]', required=False, type=float, default=2.0,
                         help='upper bound of k-mer scoring function for mecat2ref+ [1-infinity]')
+    parser.add_argument('--delta', metavar='[real]', required=False, type=float, default=0.9,
+                        help='threshold for alignment scoring [0-1]')
     parser.add_argument('-k', metavar='[int]', required=False, type=int, default=14,
                         help='size of k-mer [4-15]')
     #parser.add_argument('--ratio', required=False, type=float, default=0.2,
@@ -61,6 +63,7 @@ if __name__ == '__main__':
     block1 = args.b
     lower_score = args.alpha
     uppser_score = args.beta
+    filter_score = args.delta
     err_dist = args.epsilon
     min_len = args.l
     block2 = args.a
@@ -79,6 +82,9 @@ if __name__ == '__main__':
         exit(1)
     if not 1.0 <= uppser_score:
         print('Upper bound of k-mer scoring must be >= 1', file=sys.stderr)
+        exit(1)
+    if not 0.0 <= filter_score <= 1.0:
+        print('threshold for alignment scoring must be [0-1]', file=sys.stderr)
         exit(1)
     if not 5 <= err_dist <= 100:
         print('Distance to join two vertices must be [5-100]', file=sys.stderr)
@@ -224,7 +230,8 @@ if __name__ == '__main__':
                         '-p', read_to_ref2_path,
                         '-l', str(lower_score),
                         '-u', str(uppser_score),
-                        '-z', str(block2)],
+                        '-z', str(block2),
+                        '-y', str(filter_score)],
                     cwd=mecat_ref_dir)
             #print(ret.returncode)
                     
@@ -432,4 +439,5 @@ if __name__ == '__main__':
     print('Final output: {}'.format(final_out))
 
     print('Time used: {:.3f} seconds'.format(time.time() - start_time))
+
 

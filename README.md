@@ -47,6 +47,8 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/genome -
 
 `--beta [real]`, upper bound of k-mer scoring function for mecat2ref+ (default: 2.0)
 
+`--delta [real]`, threshold for alignment scoring (default: 0.9)
+
 `-k [int]`, size of k-mers in A-Bruijn graph (default: 14)
 
 `--epsilon [int]`, distance to join two vertices in A-Bruijn graph (default: 10)
@@ -58,3 +60,4 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/genome -
 `-t [int]`, number of threads (default: 16)
 
 [aligngraph]: https://github.com/baoe/AlignGraph
+
