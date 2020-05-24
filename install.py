@@ -20,6 +20,14 @@ if __name__ == '__main__':
                                  '{}-{}'.format(uname.sysname, 'amd64' if uname.machine == 'x86_64' else uname.machine),
                                  'bin', 'mecat2ref')
 
+    try:
+        subprocess.run(['cmake', '--version'],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.STDOUT)
+    except FileNotFoundError:
+        print('Error: Couldn\'t find CMake')
+        exit(1)
+
     with open(log_path, 'w') as log_f:
         pass    # Clear file
     print('Log file is located in {}'.format(log_path))
