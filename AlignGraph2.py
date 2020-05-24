@@ -162,6 +162,7 @@ if __name__ == '__main__':
             shutil.rmtree(sp_input_dir)
         if os.path.exists(pagraph_dir):
             shutil.rmtree(pagraph_dir)
+            #pass
         if os.path.exists(pagraph_m_dir):
             shutil.rmtree(pagraph_m_dir)
         if os.path.exists(cns_dir):
@@ -185,7 +186,9 @@ if __name__ == '__main__':
     read_to_ref_path = os.path.join(mecat_ref_dir, 'read_to_ref.txt')
     read_to_ref2_path = os.path.join(mecat_ref_dir, 'read_to_ref2.txt')
     ctg_to_ref_path = os.path.join(mummer_dir, 'ctg_to_ref.txt')
-    
+
+    import script.split_helper
+
     # K-mer count
     print('K-Mer counting...')
     subprocess.run([kmer_count_cmd,
@@ -326,7 +329,6 @@ if __name__ == '__main__':
     print('Done')
     
     # split
-    import script.split_helper
     script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
 
     # pagraph

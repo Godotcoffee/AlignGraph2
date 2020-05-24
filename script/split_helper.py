@@ -91,7 +91,13 @@ def merge_out(sp_dir, mg_dir):
                     seq = next(SeqIO.parse(os.path.join(sp_dir, d, ctg), 'fasta'))
                     seq.id = d + '_' +  seq.id
                     SeqIO.write(seq, os.path.join(mg_dir, '{}_{}'.format(d, ctg)), 'fasta')
-                for con in (f for f in os.listdir(os.path.join(sp_dir, d)) if os.path.splitext(f)[1] == '.con'):
-                    with open(os.path.join(sp_dir, d, con)) as cii:
-                        ci.writelines(cii.readlines())
-                        ci.write('\n')
+                    try:
+                        with open(os.path.join(sp_dir, d, os.path.splitext(ctg)[0]) + '.con') as cii:
+                            all_lines = cii.readlines()
+                            sp = all_lines[0].split()
+                            ci.write('{}\t{}\n'.format(seq.id, sp[1]))
+                            ci.writelines(all_lines[1:])
+                            ci.write('\n')
+                    except:
+                        pass
+                    
