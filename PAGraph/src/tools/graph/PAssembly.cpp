@@ -275,6 +275,9 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
             std::string helpPath(outDir + "/" + prefix
                                 + std::to_string(i / 2) + "_" + std::to_string(i % 2) + ".help");
 
+            std::string conPath(outDir + "/" + prefix
+                                + std::to_string(i / 2) + "_" + std::to_string(i % 2) + ".con");
+
             std::ofstream helpOut(helpPath);
 
             helpOut << totalLen << std::endl;
@@ -284,16 +287,25 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
 
             std::ofstream fastaOf(outPath);
 
+            std::ofstream conOf(conPath);
+
             fastaOf << ">" << nameStream.str() << std::endl;
 
             std::size_t cnt = 0;
 
+            std::vector<std::pair<std::pair<std::string, bool>, std::size_t>> conInf;
+            std::size_t cmbLen = 0;
             combatSeq(results, *pCtgMapper, i / 2, i % 2 == 0,
                       [&](std::size_t ctgId, bool forward, std::size_t startPos)-> bool {
                           std::cout << i << "=" << ctgId << std::endl;
+                          auto ctgName = (*pContigDB)[ctgId].name();
+                          bool ctgForward = forward;
+                          auto ctgLen = (*pContigDB)[ctgId].size();
+                          conInf.push_back(std::make_pair(std::make_pair(ctgName, ctgForward), ctgLen));
                           for (auto ch : algo.seqToString(results[ctgId * 2 + (forward ? 0 : 1)], deviation,
                                                           errorRate)) {
                               fastaOf << ch;
+                              ++cmbLen;
                               if (++cnt % lineSize == 0) {
                                   fastaOf << std::endl;
                                   cnt = 0;
@@ -305,6 +317,11 @@ PAssembly::testTravel5(const std::string &outDir, const std::string &prefix, std
             if (cnt > 0) {
                 fastaOf << std::endl;
             }
+            conOf << nameStream.str() << "\t" << cmbLen << std::endl;
+            for (auto &cnv: conInf) {
+                conOf << cnv.first.first << "\t" << (cnv.first.second ? "FORWARD" : "REV") << "\t" << cnv.second << std::endl;
+            }
+
             std::cout << "Out file: " << outPath << std::endl;
 
             for (auto &success : connected) {

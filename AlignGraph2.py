@@ -435,6 +435,7 @@ if __name__ == '__main__':
     shutil.copyfile(os.path.join(cns_in_dir, 'include.fasta'), os.path.join(out_dir, 'remainder.fasta'))
     shutil.copyfile(os.path.join(cns_in_dir, 'exclude.fasta'), os.path.join(out_dir, 'exclude.fasta'))
     shutil.copyfile(os.path.join(cns_out_dir, 'cor.fasta'), os.path.join(out_dir, 'add.fasta'))
+    shutil.copyfile(os.path.join(pagraph_m_dir, 'coninfo'), os.path.join(out_dir, 'connect_info.txt'))
 
     print('Final output: {}'.format(final_out))
 

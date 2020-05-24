@@ -82,7 +82,7 @@ def split_pre_process(ctg_path, ref_path, aln_path, dir_path, out_path):
 
 
 def merge_out(sp_dir, mg_dir):
-    with open(os.path.join(mg_dir, 'contig.txt'), 'w') as co:
+    with open(os.path.join(mg_dir, 'contig.txt'), 'w') as co, open(os.path.join(mg_dir, 'coninfo'), 'w') as ci:
         for d in os.listdir(sp_dir):
             if os.path.isfile(os.path.join(sp_dir, d, 'DONE')):
                 with open(os.path.join(sp_dir, d, 'contig.txt')) as one_c:
@@ -91,5 +91,7 @@ def merge_out(sp_dir, mg_dir):
                     seq = next(SeqIO.parse(os.path.join(sp_dir, d, ctg), 'fasta'))
                     seq.id = d + '_' +  seq.id
                     SeqIO.write(seq, os.path.join(mg_dir, '{}_{}'.format(d, ctg)), 'fasta')
-
-
+                for con in (f for f in os.listdir(os.path.join(sp_dir, d)) if os.path.splitext(f)[1] == '.con'):
+                    with open(os.path.join(sp_dir, d, con)) as cii:
+                        ci.writelines(cii.readlines())
+                        ci.write('\n')
