@@ -5,12 +5,24 @@ import subprocess
 import time
 import stat
 import tarfile
+import argparse
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Installation of AlignGraph2', formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0beta')
+    parser.add_argument('-t', '--thread', metavar='[int]', required=False, type=int, default=4,
+                        help='thread number')
+    #parser.add_argument('--clean', required=False, action='store_true',
+    #                    help='clean file after running')
+
+    args = parser.parse_args()
+
     total_start_time = time.time()
     root_dir = os.path.dirname(os.path.realpath(__file__))
     log_path = os.path.join(root_dir, 'build.log')
-    build_thread = 4
+    build_thread = args.thread
 
     uname = os.uname()
     mecat_ref_cmd = os.path.join(root_dir, 'thirdparty', 'mecat',
@@ -27,6 +39,9 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print('Error: Couldn\'t find CMake')
         exit(1)
+
+    print('Build with {} threads'.format(build_thread))
+    print(r'Number of threads can be modified by adding \'-t {thread_num}\''.format(build_thread))
 
     with open(log_path, 'w') as log_f:
         pass    # Clear file
