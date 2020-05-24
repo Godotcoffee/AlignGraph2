@@ -41,7 +41,7 @@ if __name__ == '__main__':
         exit(1)
 
     print('Build with {} threads'.format(build_thread))
-    print(r'Number of threads can be modified by adding \'-t {thread_num}\'')
+    print(r"Number of threads can be modified by adding '-t {thread_num}'")
 
     with open(log_path, 'w') as log_f:
         pass    # Clear file
