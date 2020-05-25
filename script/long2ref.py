@@ -52,8 +52,8 @@ def long2ref(mecat_cmd, mecat_cmd2, ctg_path, ref_path, wrk_dir, thread_num, out
                     cwd=wrk_dir)
 
         if ret.returncode == 0:
-            import script.filter
-            script.filter.filter_error(tmp_ref_path, tmp_ref2_path)
+            from . import filter
+            filter.filter_error(tmp_ref_path, tmp_ref2_path)
     else:
         ret = subprocess.run([mecat_cmd2,
                         '-t', str(thread_num),
