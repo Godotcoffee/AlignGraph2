@@ -4,10 +4,12 @@ import sys
 import os
 import subprocess
 import time
+from script import saved_helper
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='AlignGraph2', formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description='Similar genome assisted reassembly pipeline for PacBio long reads', 
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('--version', action='version', version='%(prog)s 1.0beta')
     parser.add_argument('-r', '--read', metavar='[fastq]', required=True, type=str, default=argparse.SUPPRESS,
@@ -157,18 +159,18 @@ if __name__ == '__main__':
     os.makedirs(mecat_ref_dir, exist_ok=True)
     os.makedirs(mummer_dir, exist_ok=True)
     os.makedirs(mummer_tmp_dir, exist_ok=True)
-    try:
-        if os.path.exists(sp_input_dir):
-            shutil.rmtree(sp_input_dir)
-        if os.path.exists(pagraph_dir):
-            shutil.rmtree(pagraph_dir)
-            #pass
-        if os.path.exists(pagraph_m_dir):
-            shutil.rmtree(pagraph_m_dir)
-        if os.path.exists(cns_dir):
-            shutil.rmtree(cns_dir)
-    except:
-        pass
+    #try:
+    #    if os.path.exists(sp_input_dir):
+    #        shutil.rmtree(sp_input_dir)
+    #    if os.path.exists(pagraph_dir):
+    #        shutil.rmtree(pagraph_dir)
+    #        #pass
+    #    if os.path.exists(pagraph_m_dir):
+    #        shutil.rmtree(pagraph_m_dir)
+    #    if os.path.exists(cns_dir):
+    #        shutil.rmtree(cns_dir)
+    #except:
+    #    pass
     os.makedirs(input_dir, exist_ok=True)
     os.makedirs(sp_input_dir, exist_ok=True)
     os.makedirs(pagraph_dir, exist_ok=True)
@@ -191,158 +193,203 @@ if __name__ == '__main__':
 
     # K-mer count
     print('K-Mer counting...')
-    subprocess.run([kmer_count_cmd,
-                    '-t', str(thread_num),
-                    '-i', read_path,
-                    '-o', solid_kmer_path,
-                    '-k', str(k)
-                    #'-m', str(ratio)
-                    ])
-    print('Done')
+    if not saved_helper.check(wrk_dir, read_path) or not saved_helper.check_args(wrk_dir, k=k):
+        saved_helper.remove(wrk_dir)
+        subprocess.run([kmer_count_cmd,
+                        '-t', str(thread_num),
+                        '-i', read_path,
+                        '-o', solid_kmer_path,
+                        '-k', str(k)
+                        #'-m', str(ratio)
+                        ])
+        saved_helper.save(wrk_dir, read_path)
+        saved_helper.save_args(wrk_dir, k=k)
+        print('Done')
+    else:
+        print('Reuse')
 
     # Read to Contig
     print('Read to Contig...')
-    subprocess.run([mecat_ref_cmd,
-                    '-t', str(thread_num),
-                    '-d', read_path,
-                    '-r', ctg_path,
-                    '-b', str(1),
-                    '-w', './wrk',
-                    '-o', read_to_ctg_path],
-                   cwd=mecat_ctg_dir)
-    print('Done')
-    
-    # Read to Ref
-    print('Read to Ref...')
-    okok = False
-    
-    if aligned_mode == 'MECAT':
-        try:
-            #if os.path.exists(read_to_ref_path):
-            #    os.remove(read_to_ref_path)
-            #if os.path.exists(read_to_ref2_path):
-            #    os.remove(read_to_ref2_path)
-            #print(mecat_ref2_cmd)
-            ret = subprocess.run([mecat_ref2_cmd,
-                        '-t', str(thread_num),
-                        '-d', read_path,
-                        '-r', ref_path,
-                        '-b', str(1),
-                        '-w', './wrk',
-                        '-o', 'dummy',
-                        '-p', read_to_ref2_path,
-                        '-l', str(lower_score),
-                        '-u', str(uppser_score),
-                        '-z', str(block2),
-                        '-y', str(filter_score)],
-                    cwd=mecat_ref_dir)
-            #print(ret.returncode)
-                    
-            if ret.returncode == 0:
-                import script.filter
-                script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
-                okok = True
-        except:
-            pass
-
-    if not okok:
+    if not saved_helper.check(mecat_ctg_dir, read_path, ctg_path):
+        saved_helper.remove(mecat_ctg_dir)
         subprocess.run([mecat_ref_cmd,
                         '-t', str(thread_num),
                         '-d', read_path,
-                        '-r', ref_path,
+                        '-r', ctg_path,
                         '-b', str(1),
                         '-w', './wrk',
-                        '-o', read_to_ref_path],
-                    cwd=mecat_ref_dir)
-    print('Done')
+                        '-o', read_to_ctg_path],
+                    cwd=mecat_ctg_dir)
+        saved_helper.save(mecat_ctg_dir, read_path, ctg_path)
+        print('Done')
+    else:
+        print('Reuse')
+    
+    mecat_rerun = False
+
+    # Read to Ref
+    print('Read to Ref...')
+
+    mecat_mode = mecat_ref2_cmd if aligned_mode == 'MECAT' else mecat_ref_cmd
+    mecat_args_check = aligned_mode != 'MECAT' or saved_helper.check_args(mecat_ref_dir, l=lower_score, u=uppser_score, z=block2, y=filter_score)
+
+    if not saved_helper.check(mecat_ref_dir, read_path, ref_path, mecat_mode) or not mecat_args_check:
+        saved_helper.remove(mecat_ref_dir)
+        mecat_rerun = True
+        okok = False
+        
+        if aligned_mode == 'MECAT':
+            try:
+                #if os.path.exists(read_to_ref_path):
+                #    os.remove(read_to_ref_path)
+                #if os.path.exists(read_to_ref2_path):
+                #    os.remove(read_to_ref2_path)
+                #print(mecat_ref2_cmd)
+                ret = subprocess.run([mecat_ref2_cmd,
+                            '-t', str(thread_num),
+                            '-d', read_path,
+                            '-r', ref_path,
+                            '-b', str(1),
+                            '-w', './wrk',
+                            '-o', 'dummy',
+                            '-p', read_to_ref2_path,
+                            '-l', str(lower_score),
+                            '-u', str(uppser_score),
+                            '-z', str(block2),
+                            '-y', str(filter_score)],
+                        cwd=mecat_ref_dir)
+                #print(ret.returncode)
+                        
+                if ret.returncode == 0:
+                    import script.filter
+                    script.filter.filter_error(read_to_ref2_path, read_to_ref_path)
+                    saved_helper.save_args(mecat_ref_dir, l=lower_score, u=uppser_score, z=block2, y=filter_score)
+                    okok = True
+            except:
+                pass
+
+        if not okok:
+            subprocess.run([mecat_ref_cmd,
+                            '-t', str(thread_num),
+                            '-d', read_path,
+                            '-r', ref_path,
+                            '-b', str(1),
+                            '-w', './wrk',
+                            '-o', read_to_ref_path],
+                        cwd=mecat_ref_dir)
+        saved_helper.save(mecat_ref_dir, read_path, ref_path, mecat_mode)
+        print('Done')
+    else:
+        print('Reuse')
     
     # Contig to Ref
     print('Contig to Ref...')
     
     #if aligned_mode != 'MECAT' or not os.path.exists(mecat_ref2_cmd):
-    okok2 = False
+    if not saved_helper.check(mummer_dir, ctg_path, ref_path):
+        saved_helper.remove(mummer_dir)
+        okok2 = False
+    
+        try:
+            import script.long2ref
+            script.long2ref.long2ref(mecat_ref2_cmd, mecat_ref_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
+            okok2 = True
+        except:
+            pass
 
-   
-    try:
-        import script.long2ref
-        script.long2ref.long2ref(mecat_ref2_cmd, mecat_ref_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
-        okok2 = True
-    except:
-        pass
+        if okok2 == False:
+            # nucmer
+            subprocess.run([nucmer_cmd,
+                            '-t', str(thread_num),
+                            #'-l', '100',
+                            #'-c', '1000',
+                            '-g', '100',
+                            '--banded',
+                            ref_path,
+                            ctg_path],
+                        cwd=mummer_dir)
 
-    if okok2 == False:
-        # nucmer
-        subprocess.run([nucmer_cmd,
-                        '-t', str(thread_num),
-                        #'-l', '100',
-                        #'-c', '1000',
-                        '-g', '100',
-                        '--banded',
-                        ref_path,
-                        ctg_path],
-                    cwd=mummer_dir)
+            # delta-filter
+            #out_filter_path = os.path.join(mummer_dir, 'out.filter.delta')
+            #with open(out_filter_path, 'w') as filter_f:
+            #    subprocess.run([delta_fileter_cmd,
+            #                    '-q',
+            #                    '-r',
+            #                    os.path.join(mummer_dir, 'out.delta')],
+            #                   cwd=mummer_dir,
+            #                   stdout=filter_f)
+            
+            # convert
+            #show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
+            #import script.parse_nucmer_align
+            #script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
+            
+            # convert
+            with open(out_paf_path, 'w') as paf_f:
+                subprocess.run([k8_cmd,
+                                paf_tools,
+                                'delta2paf',
+                                os.path.join(mummer_dir, 'out.delta')],
+                            cwd=mummer_dir,
+                            stdout=paf_f)
+            
+            import script.paf2aln
 
-        # delta-filter
-        #out_filter_path = os.path.join(mummer_dir, 'out.filter.delta')
-        #with open(out_filter_path, 'w') as filter_f:
-        #    subprocess.run([delta_fileter_cmd,
-        #                    '-q',
-        #                    '-r',
-        #                    os.path.join(mummer_dir, 'out.delta')],
-        #                   cwd=mummer_dir,
-        #                   stdout=filter_f)
-        
-        # convert
-        #show_align_cmd = os.path.join(root_dir, 'thirdparty', 'mummer', 'show-aligns')
-        #import script.parse_nucmer_align
-        #script.parse_nucmer_align.main([show_align_cmd, out_filter_path, ctg_to_ref_path, mummer_tmp_dir, str(thread_num)])
-        
-        # convert
-        with open(out_paf_path, 'w') as paf_f:
-            subprocess.run([k8_cmd,
-                            paf_tools,
-                            'delta2paf',
-                            os.path.join(mummer_dir, 'out.delta')],
-                        cwd=mummer_dir,
-                        stdout=paf_f)
-        
-        import script.paf2aln
+            script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)
+        #else:
+        #    import script.long2ref
+        #    script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
 
-        script.paf2aln.paf2aln(ctg_path, ref_path, out_paf_path, ctg_to_ref_path, thread_num)
-    #else:
-    #    import script.long2ref
-    #    script.long2ref.long2ref(mecat_ref2_cmd, ctg_path, ref_path, mummer_dir, thread_num, ctg_to_ref_path)
-
-    print('Done')
+        print('Done')
+        saved_helper.save(mummer_dir, ctg_path, ref_path)
+    else:
+        print('Reuse')
 
     # pre_process
     print('Pre process...')
-
-    subprocess.run([pre_process_cmd, 
-                    '-r', read_path,
-                    '-c', ctg_path,
-                    '-x', read_to_ctg_path,
-                    '-y', read_to_ref_path,
-                    '-z', ctg_to_ref_path,
-                    '-o', input_dir])
-
-    print('Done')
-    
-    # split
-    script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
+    if not saved_helper.check(input_dir, read_path, ctg_path, ref_path) or mecat_rerun:
+        saved_helper.remove(input_dir)
+        subprocess.run([pre_process_cmd, 
+                        '-r', read_path,
+                        '-c', ctg_path,
+                        '-x', read_to_ctg_path,
+                        '-y', read_to_ref_path,
+                        '-z', ctg_to_ref_path,
+                        '-o', input_dir])
+        try:
+            if os.path.exists(sp_input_dir):
+                shutil.rmtree(sp_input_dir)
+            if os.path.exists(pagraph_dir):
+                shutil.rmtree(pagraph_dir)
+                #pass
+            if os.path.exists(pagraph_m_dir):
+                shutil.rmtree(pagraph_m_dir)
+            os.makedirs(sp_input_dir, exist_ok=True)
+            os.makedirs(pagraph_dir, exist_ok=True)
+            os.makedirs(pagraph_m_dir, exist_ok=True)
+        except:
+            pass
+        script.split_helper.split_pre_process(ctg_path, ref_path, ctg_to_ref_path, input_dir, sp_input_dir)
+        saved_helper.save(input_dir, read_path, ctg_path, ref_path)
+        print('Done')
+    else:
+        print('Reuse')
 
     # pagraph
     print('PAGraph...')
-
+    run_new = False
+    at_least = False
     for d in os.listdir(sp_input_dir):
+        at_least = True
         in_dir = os.path.join(sp_input_dir, d)
         tmp_out_dir = os.path.join(pagraph_dir, d)
         os.makedirs(tmp_out_dir, exist_ok=True)
 
-        #if os.path.isfile(os.path.join(out_dir, 'DONE')):
-        #    print('Ignore {}'.format(d))
-        #    continue
+        if saved_helper.check_args(tmp_out_dir, k=k, r=min_len, e=err_dist) and os.path.isfile(os.path.join(tmp_out_dir, 'DONE')):
+            print('Ignore {}'.format(d))
+            continue
 
+        run_new = True
         p_ctg_path = os.path.join(in_dir, 'ctg.fasta')
         p_ref_path = os.path.join(in_dir, 'ref.fasta')
         p_aln_path = os.path.join(in_dir, 'aln')
@@ -363,6 +410,7 @@ if __name__ == '__main__':
 
         with open(os.path.join(tmp_out_dir, 'DONE'), 'w'):
             pass
+        saved_helper.save_args(tmp_out_dir, k=k, r=min_len, e=err_dist)
 
     #subprocess.run([pagraph_cmd,
     #                '-t', str(thread_num),
@@ -378,59 +426,78 @@ if __name__ == '__main__':
     script.split_helper.merge_out(pagraph_dir, pagraph_m_dir)
 
     print('Done')
-
     import script.cns_helper as cns_helper
-    
-    # extract
-    print('Extract and split...')
+    if run_new or not at_least or not saved_helper.check_args(cns_dir, p=block2):
+        saved_helper.remove_args(cns_dir)
+        try:
+            if os.path.exists(cns_out_dir):
+                shutil.rmtree(cns_out_dir)
+            if os.path.exists(cns_wrk_split_dir):
+                shutil.rmtree(cns_wrk_split_dir)
+        except:
+            pass
+        os.makedirs(cns_dir, exist_ok=True)
+        os.makedirs(cns_in_dir, exist_ok=True)
+        os.makedirs(cns_out_dir, exist_ok=True)
+        os.makedirs(cns_wrk_dir, exist_ok=True)
+        os.makedirs(cns_wrk_mecat_dir, exist_ok=True)
+        os.makedirs(cns_wrk_split_dir, exist_ok=True)
+        os.makedirs(cns_wrk_ref_dir, exist_ok=True)
+        
+        # extract
+        print('Extract and split...')
 
-    import script.extract
-    script.extract.action(ctg_path, pagraph_m_dir, os.path.join(pagraph_m_dir, 'contig.txt'), cns_in_dir)
-    mapping = cns_helper.split_fasta(os.path.join(cns_in_dir, 'add.fasta'), cns_wrk_split_dir)
+        import script.extract
+        script.extract.action(ctg_path, pagraph_m_dir, os.path.join(pagraph_m_dir, 'contig.txt'), cns_in_dir)
+        mapping = cns_helper.split_fasta(os.path.join(cns_in_dir, 'add.fasta'), cns_wrk_split_dir)
 
-    print('Done')
+        print('Done')
 
-    # align
-    print('Align and split...')
+        # align
+        print('Align and split...')
+        if run_new or not saved_helper.check(cns_wrk_mecat_dir):
+            saved_helper.remove(cns_wrk_mecat_dir)
+            subprocess.run([mecat_ref_cmd,
+                            '-t', str(thread_num),
+                            '-d', read_path,
+                            '-r', os.path.join(cns_in_dir, 'all.fasta'),
+                            '-b', str(1),
+                            '-w', './wrk',
+                            '-o', os.path.join(cns_wrk_mecat_dir, 'merge.ref')],
+                        cwd=cns_wrk_mecat_dir)
+            cns_helper.split_ref(os.path.join(cns_wrk_mecat_dir, 'merge.ref'), cns_wrk_ref_dir, mapping)
+            saved_helper.save(cns_wrk_mecat_dir)
+            print('Done')
+        else:
+            print('Reuse')
 
-    subprocess.run([mecat_ref_cmd,
-                    '-t', str(thread_num),
-                    '-d', read_path,
-                    '-r', os.path.join(cns_in_dir, 'all.fasta'),
-                    '-b', str(1),
-                    '-w', './wrk',
-                    '-o', os.path.join(cns_wrk_mecat_dir, 'merge.ref')],
-                   cwd=cns_wrk_mecat_dir)
+        # Correct
+        print('Correct...')
+        #part_len = 10000
+        part_len = block2
+        top_k = 3000
 
-    cns_helper.split_ref(os.path.join(cns_wrk_mecat_dir, 'merge.ref'), cns_wrk_ref_dir, mapping)
+        fasta_cor_path_list = list()
 
-    print('Done')
+        for ctg, idx in mapping.items():
+            print('\tcorrecting {}'.format(ctg))
 
-    # Correct
-    print('Correct...')
-    #part_len = 10000
-    part_len = block2
-    top_k = 3000
+            subprocess.run([pa_cns_cmd, '-i', os.path.join(cns_wrk_split_dir, idx),
+                            '-a', os.path.join(cns_wrk_ref_dir, '{}.ref'.format(idx)),
+                            '-o', os.path.join(cns_out_dir, '{}.new'.format(idx)),
+                            '-l', str(part_len),
+                            '-t', str(thread_num),
+                            '-k', str(top_k)])
 
-    fasta_cor_path_list = list()
+            fasta_cor_path_list.append(os.path.join(cns_out_dir, '{}.new'.format(idx)))
 
-    for ctg, idx in mapping.items():
-        print('\tcorrecting {}'.format(ctg))
-
-        subprocess.run([pa_cns_cmd, '-i', os.path.join(cns_wrk_split_dir, idx),
-                        '-a', os.path.join(cns_wrk_ref_dir, '{}.ref'.format(idx)),
-                        '-o', os.path.join(cns_out_dir, '{}.new'.format(idx)),
-                        '-l', str(part_len),
-                        '-t', str(thread_num),
-                        '-k', str(top_k)])
-
-        fasta_cor_path_list.append(os.path.join(cns_out_dir, '{}.new'.format(idx)))
-
-    f_out = os.path.join(cns_out_dir, 'cor.fasta')
-    cns_helper.merge_fasta(f_out, *fasta_cor_path_list)
-    print('Out file: {}'.format(f_out))
-
-    print('Done')
+        f_out = os.path.join(cns_out_dir, 'cor.fasta')
+        cns_helper.merge_fasta(f_out, *fasta_cor_path_list)
+        print('Out file: {}'.format(f_out))
+        saved_helper.save_args(cns_dir, p=block2)
+        print('Done')
+    else:
+        print('Reuse')
 
     final_out = os.path.join(out_dir, 'final.fasta')
     cns_helper.merge_fasta(final_out, os.path.join(cns_in_dir, 'include.fasta'), os.path.join(cns_out_dir, 'cor.fasta'))
@@ -442,5 +509,3 @@ if __name__ == '__main__':
     print('Final output: {}'.format(final_out))
 
     print('Time used: {:.3f} seconds'.format(time.time() - start_time))
-
-
