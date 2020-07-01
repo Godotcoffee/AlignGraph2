@@ -6,6 +6,12 @@ import subprocess
 import time
 from script import saved_helper
 
+try:
+    import Bio
+except ImportError:
+    print('Error: Biopython not found. ', file=sys.stderr)
+    exit(1)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Similar genome assisted reassembly pipeline for PacBio long reads', 
