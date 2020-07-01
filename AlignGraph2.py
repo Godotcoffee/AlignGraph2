@@ -6,18 +6,12 @@ import subprocess
 import time
 from script import saved_helper
 
-try:
-    import Bio
-except ImportError:
-    print('Error: Biopython not found. ', file=sys.stderr)
-    exit(1)
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Similar genome assisted reassembly pipeline for PacBio long reads', 
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument('--version', action='version', version='%(prog)s 1.0beta')
+    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
     parser.add_argument('-r', '--read', metavar='[fastq]', required=True, type=str, default=argparse.SUPPRESS,
                         help='read path')
     parser.add_argument('-c', '--contig', metavar='[fasta]', required=True, type=str, default=argparse.SUPPRESS,
@@ -51,11 +45,22 @@ if __name__ == '__main__':
     #parser.add_argument('--clean', required=False, action='store_true',
     #                    help='clean file after running')
 
+    biopython_found = False
+
+    try:
+        import Bio
+        biopython_found = True
+    except ImportError:
+        print('Error: Biopython not found.', file=sys.stderr)
+
     if len(sys.argv) <= 1:
         parser.print_help(file=sys.stderr)
         parser.exit()
 
     args = parser.parse_args()
+
+    if not biopython_found:
+        exit(1)
 
     start_time = time.time()
 
