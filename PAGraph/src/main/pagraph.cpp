@@ -80,6 +80,7 @@ int run2(int argc, char* argv[])
     args::ValueFlag<std::string> outArg(parser, "path", "output directory", {'o', "output"});
     args::ValueFlag<std::size_t> minLenArg(parser, "len", "minimum path length", {'l', "length"}, 50);
     args::ValueFlag<std::size_t> devArg(parser, "dist", "distance to join vertices", {"epsilon"}, 10);
+    args::ValueFlag<std::size_t> covArg(parser, "cov", "coverage to filter", {'v'}, 1);
 
     if (argc <= 1) {
         std::cerr << parser;
@@ -118,6 +119,7 @@ int run2(int argc, char* argv[])
     std::size_t ctgToRefMinLen = 50;
     //std::size_t posError = 10;
     std::size_t posError = args::get(devArg);
+    std::size_t covFilter = args::get(covArg);
     double errorRate = 0.15;
     double startSplit = 0.90;
     auto minLen = args::get(minLenArg);
@@ -213,6 +215,7 @@ int run2(int argc, char* argv[])
         pp.setCtgToRefRatio(ctgToRefRatio);
         pp.setCtgToRefTotalRatio(ctgToRefTotalRatio);
         pp.setCtgToRefMinLen(ctgToRefMinLen);
+        pp.setCovFilter(covFilter);
         pp.setThreadNum(threadNum);
 
         pp.clearRefFilter(false);

@@ -137,6 +137,15 @@ void Aligner::parseToRef(T functor, unsigned int threadNum) {
                     auto &queryDiff = align.getQueryDiff();
                     auto &refDiff = align.getRefDiff();
 
+                    std::size_t maxCov = 0;
+
+                    for (std::size_t pos = align.getRefBegin(); pos < align.getRefEnd(); ++pos) {
+                        if (pos >= _refCov[refIdx].size()) { break; }
+                        maxCov = std::max(maxCov, _refCov[refIdx][pos]);
+                    }
+
+                    if (maxCov < _covFilter) { continue; }
+
                     if (!isForward) {
                         flipPosition(readBegin, readEnd, readLen);
                     }

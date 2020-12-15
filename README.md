@@ -49,6 +49,8 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/genome -
 
 `--delta [real]`, threshold for alignment scoring (default: 0.9)
 
+`-v [int]`, coverage to filter alignments (default: 2)
+
 `-k [int]`, size of k-mers in A-Bruijn graph (default: 14)
 
 `--epsilon [int]`, distance to join two vertices in A-Bruijn graph (default: 10)

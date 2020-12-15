@@ -57,6 +57,7 @@ public:
     double readToRefRatio = 0.4;
     double ctgToRefRatio = 0.1;
     double ctgToRefTotalRatio = 0.3;
+    //std::size_t covFilter = 1;
     std::size_t ctgToRefMinLen = 2500;
     unsigned threadNum = 8;
 
@@ -94,6 +95,8 @@ public:
     void setInnerSample(int innerSample);
 
     void setPositionError(std::size_t error);
+
+    void setCovFilter(std::size_t cov);
 
     void setThreadNum(unsigned threadNum);
 

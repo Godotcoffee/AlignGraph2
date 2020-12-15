@@ -211,6 +211,10 @@ void PositionProcessor::setPositionError(std::size_t error) {
     this->posError = error;
 }
 
+void PositionProcessor::setCovFilter(std::size_t cov) {
+    _aligner.setCovFilter(cov);
+}
+
 void PositionProcessor::setThreadNum(unsigned threadNum) {
     this->threadNum = threadNum;
 }

@@ -46,6 +46,8 @@ private:
     double  _readToRefRatio = 0.4;
     double  _ctgToRefRatio = 0.1;
     double  _ctgToRefTotalRatio = 0.3;
+    std::size_t
+            _covFilter = 1;
     std::size_t _ctgToRefMinLen = 2500;
 
     /**
@@ -76,6 +78,9 @@ private:
     std::vector<std::vector<ExAlignInf>> _readToRef;
     std::vector<std::vector<ExAlignInf>> _contigToRef;
 
+    /* Coverage */
+    std::vector<std::vector<std::size_t>> _refCov;
+
     /* Alignments between contigs and references */
     AlignReference _alignReference;
 
@@ -95,6 +100,11 @@ private:
     static void
     mergeAlignInfHelper(std::vector<std::vector<ExAlignInf>> &align, const IAlignDatabase<AlignInf> &alignDB,
                         const ISeqDatabase<SeqInf> &queryDB, const ISeqDatabase<SeqInf> &refDB);
+
+    static void
+    covInfHelper(std::vector<std::vector<std::size_t>> &align,
+                               const IAlignDatabase<AlignInf> &alignDB,
+                               const ISeqDatabase<SeqInf> &queryDB, const ISeqDatabase<SeqInf> &refDB);
 
     bool queryContig(std::size_t contigIdx, std::size_t contigPos, bool forward,
                      std::vector<std::pair<ref_pos_t, ref_pos_t>> &positions) const;
@@ -169,6 +179,8 @@ public:
     void setCtgToRefTotalRatio(double ctgToRefTotalRatio);
 
     void setCtgToRefMinLen(std::size_t ctgToRefMinLen);
+
+    void setCovFilter(std::size_t cov);
 
     bool setRefFilter(const std::string &refName, bool accepted);
 

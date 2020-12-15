@@ -55,10 +55,43 @@ void Aligner::mergeAlignInfHelper(std::vector<std::vector<Aligner::ExAlignInf>> 
     }
 }
 
+void Aligner::covInfHelper(std::vector<std::vector<std::size_t>> &align,
+                                  const IAlignDatabase<AlignInf> &alignDB,
+                                  const ISeqDatabase<SeqInf> &queryDB, const ISeqDatabase<SeqInf> &refDB) {
+    align.clear();
+    align.resize(refDB.size());
+
+    for (std::size_t i = 0; i < refDB.size(); ++i) {
+        align[i].resize(refDB[i].size());
+    }
+
+    std::size_t total = alignDB.size();
+
+    for (decltype(total) i = 0; i < total; ++i) {
+        auto &alignInf = alignDB[i];
+        auto &refName = alignInf.getRefName();
+
+        if (refDB.containsName(refName)) {
+            auto refIdx = refDB.seqId(refName);
+            auto start = alignInf.getRefBegin();
+            auto end = alignInf.getRefEnd();
+            for (std::size_t j = start; j < end; ++j) {
+                if (j >= align[refIdx].size()) { break; }
+                ++align[refIdx][j];
+            }
+        }
+    }
+
+    for (auto &a : align) {
+        std::sort(a.begin(), a.end());
+    }
+}
+
 void Aligner::mergeAlignInf() {
     mergeAlignInfHelper(_readToContig, *_pReadToCtgDB, *_pReadDB, *_pContigDB);
     mergeAlignInfHelper(_readToRef, *_pReadToRefDB, *_pReadDB, *_pReferenceDB);
     mergeAlignInfHelper(_contigToRef, *_pCtgToRefDB, *_pContigDB, *_pReferenceDB);
+    covInfHelper(_refCov, *_pReadToRefDB, *_pReadDB, *_pReferenceDB);
 }
 
 void
@@ -255,6 +288,10 @@ void Aligner::setCtgToRefTotalRatio(double ctgToRefTotalRatio) {
 
 void Aligner::setCtgToRefMinLen(std::size_t ctgToRefMinLen) {
     Aligner::_ctgToRefMinLen = ctgToRefMinLen;
+}
+
+void Aligner::setCovFilter(std::size_t cov) {
+    Aligner::_covFilter = cov;
 }
 
 bool Aligner::setRefFilter(const std::string &refName, bool accepted) {
