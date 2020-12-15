@@ -31,7 +31,7 @@ if __name__ == '__main__':
     parser.add_argument('--delta', metavar='[real]', required=False, type=float, default=0.9,
                         help='threshold for alignment scoring [0-1]')
     parser.add_argument('-v', metavar='[int]', required=False, type=int, default=2,
-                        help='coverage to filter alignments')
+                        help='coverage to filter alignments [1-infinity]')
     parser.add_argument('-k', metavar='[int]', required=False, type=int, default=14,
                         help='size of k-mer [4-15]')
     #parser.add_argument('--ratio', required=False, type=float, default=0.2,
@@ -102,8 +102,8 @@ if __name__ == '__main__':
     if not 0.0 <= filter_score <= 1.0:
         print('threshold for alignment scoring must be [0-1]', file=sys.stderr)
         exit(1)
-    if not 0 <= filter_cov:
-        print('coverage to filter alignments must be >= 0', file=sys.stderr)
+    if not 1 <= filter_cov:
+        print('coverage to filter alignments must be >= 1', file=sys.stderr)
         exit(1)
     if not 5 <= err_dist <= 100:
         print('Distance to join two vertices must be [5-100]', file=sys.stderr)
