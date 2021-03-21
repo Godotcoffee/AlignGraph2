@@ -1,3 +1,5 @@
+### Please visit this [Github site][aligngraph2] for the latest AlignGraph2 version.
+
 ## Introduction
 
 AlignGraph2 is the second version of [AlignGraph][aligngraph] for PacBio long reads. It extends and refines contigs assembled from  the long reads with a published genome similar to the sequencing genome.
@@ -62,4 +64,4 @@ python ./AlignGraph2.py -r /path/to/read -c /path/to/contig -g /path/to/genome -
 `-t [int]`, number of threads (default: 16)
 
 [aligngraph]: https://github.com/baoe/AlignGraph
-
+[aligngraph2]: https://github.com/huangs001/AlignGraph2
