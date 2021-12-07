@@ -4,6 +4,10 @@
 
 AlignGraph2 is the second version of [AlignGraph][aligngraph] for PacBio long reads. It extends and refines contigs assembled from  the long reads with a published genome similar to the sequencing genome.
 
+## How to cite AlignGraph2?
+If you use AlignGraph2, please cite the following paper:  
+Huang, S., He, X., Wang, G., & Bao, E. (2021). AlignGraph2: similar genome-assisted reassembly pipeline for PacBio long reads. Briefings in Bioinformatics: [epub](https://doi.org/10.1093/bib/bbab022).
+
 ## Requirements
 
 Linux OS 64-bit
